@@ -20,7 +20,7 @@ public class XlsToCSV {
 	public void convertXlsFileToCsv() {
 		try {
 			StringBuilder data = new StringBuilder();
-			System.out.println("Read Contracts File");
+			System.out.println("Reading Contracts File");
 			DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
 			
 			FileInputStream file = new FileInputStream(new File(Constants.CONTRACTS_XLSX));
