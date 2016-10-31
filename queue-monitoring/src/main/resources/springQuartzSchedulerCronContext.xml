@@ -26,10 +26,20 @@
 			</list>
 		</property>
 	</bean>
-
+	<!-- 
+	Name	       Required	      Allowed Values	     Allowed Special Characters
+     Seconds	      Y	               0-59	                   , - * /
+     Minutes	      Y	               0-59	                   , - * /
+     Hours	          Y	               0-23	                   , - * /
+     Day of month	  Y	               1-31	                   , - * ? / L W C
+     Month	          Y	               0-11 or JAN-DEC	       , - * /
+     Day of week	  Y	               1-7 or SUN-SAT	       , - * ? / L C #
+     Year	          N	               empty or 1970-2099	   , - * /  
+	 -->
+	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
 	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="someJob" />
-		<!-- <property name="cronExpression" value="0 0/5 * * * ?" />  -->
-		<property name="cronExpression" value="0/10 * * * * ?" />
+		<property name="cronExpression" value="0 0/5 * * * ?" />
+		<!-- <property name="cronExpression" value="0/180 * * * * ?" /> --> 
 	</bean>
 </beans>

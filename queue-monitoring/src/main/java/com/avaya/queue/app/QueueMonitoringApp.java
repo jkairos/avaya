@@ -1,22 +1,15 @@
 package com.avaya.queue.app;
 
-import java.io.InputStream;
-import java.util.Properties;
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.avaya.queue.XlsToCSV;
+import com.avaya.queue.util.QueueMonitoringProperties;
 
 public class QueueMonitoringApp {
 
 	public static void main(String[] args) throws Exception {
-		InputStream inputStream = QueueMonitoringApp.class.getResourceAsStream("/config.properties");
-
-		//now can use this input stream as usually, i.e. to load as properties
-		Properties props = new Properties();
-		props.load(inputStream);
 		
-		if(Boolean.valueOf(props.getProperty("convert.to.csv"))){
+		if(Boolean.valueOf(QueueMonitoringProperties.getProperty("convert.to.csv"))){
 			XlsToCSV xlsToCsv = new XlsToCSV();
 			xlsToCsv.convertXlsFileToCsv();
 		}

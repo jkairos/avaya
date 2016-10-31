@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
@@ -16,11 +17,21 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import com.avaya.queue.util.Constants;
+
 public class XlsToCSV {
+	private final static Logger logger = Logger.getLogger(XlsToCSV.class);
 	public void convertXlsFileToCsv() {
 		try {
 			StringBuilder data = new StringBuilder();
-			System.out.println("Reading Contracts File");
+			data.append("region,country,status,eProject,sapContract,fl,soldToName,"
+					+ "shipTo,customerNameEndUser,commentsAppsSuppTeam,sapOrder,startLastRenewed,"
+					+ "endContract,solutionApplication,apsSuppMc,apsSuppDescription,linkToSapContractDoc\n");
+			
+			if(logger.isDebugEnabled()){
+				logger.debug("Reading Contract File To Convert to CSV Format");
+			}
+			
 			DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
 			
 			FileInputStream file = new FileInputStream(new File(Constants.CONTRACTS_XLSX));
@@ -44,7 +55,6 @@ public class XlsToCSV {
 						if(HSSFDateUtil.isCellDateFormatted(cell)){
 							DateTime dt = new DateTime(cell.getDateCellValue());
 							data.append("'"+fmt.print(dt)+"',");
-							System.out.print(fmt.print(dt));
 						}else{
 							cell.setCellType(CellType.STRING);
 							String s = cell.getStringCellValue();
@@ -52,7 +62,6 @@ public class XlsToCSV {
 							s = s.replaceAll(",", "");
 							s = s.replaceAll("'", " ");
 							data.append("'" + s + "',");
-							System.out.print(s + "\t");
 							
 						}
 					}else{
@@ -62,8 +71,6 @@ public class XlsToCSV {
 						s = s.replaceAll(",", "");
 						s = s.replaceAll("'", " ");
 						data.append("'" + s + "',");
-						System.out.print(s + "\t");
-						
 					}
 					
 				}
@@ -72,7 +79,6 @@ public class XlsToCSV {
 					data.setLength(data.length()-1);
 				}
 
-				System.out.println("");
 				data.append("\n");
 			}
 
@@ -81,11 +87,18 @@ public class XlsToCSV {
 			fos.write(data.toString().getBytes());
 			fos.close();
 
-			System.out.println("End Read Contracts File");
+			if(logger.isDebugEnabled()){
+				logger.debug("Contract File Converted to CSV Format");
+			}
 			workbook.close();
 			file.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			logger.error(e);
 		}
+	}
+	
+	public static void main(String args[]){
+		new XlsToCSV().convertXlsFileToCsv();
 	}
 }

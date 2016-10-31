@@ -7,6 +7,7 @@ import java.net.URL;
 import org.apache.commons.io.FileUtils;
 
 import com.avaya.queue.security.PKIXAuthenticator;
+import com.avaya.queue.util.Constants;
 
 public class Downloader {
 

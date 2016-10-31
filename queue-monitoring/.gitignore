@@ -4,3 +4,6 @@
 /.classpath
 /.DS_Store
 /.project
+/log4j-application.log
+/velocity.log
+/velocity.log.1

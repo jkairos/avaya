@@ -1,5 +1,7 @@
 package com.avaya.queue.entity;
 
+import java.util.List;
+
 public class SR {
 	private String number;
 	private String sev;
@@ -12,10 +14,14 @@ public class SR {
 	private boolean mea;
 	private boolean DispOrPart;
 	private String productSkill;
+	private String productEntitled;
+	private String description;
 	private String fl;
 	private String flName;
 	private String country;
 	private int otherSrs;
+	private String account;
+	private List<CustomerContract> customerContracts;
 	
 	public String getNumber() {
 		return number;
@@ -108,11 +114,40 @@ public class SR {
 		this.otherSrs = otherSrs;
 	}
 	
+	public String getProductEntitled() {
+		return productEntitled;
+	}
+	public void setProductEntitled(String productEntitled) {
+		this.productEntitled = productEntitled;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	public String getAccount() {
+		return account;
+	}
+	public void setAccount(String account) {
+		this.account = account;
+	}
+	
+	public List<CustomerContract> getCustomerContracts() {
+		return customerContracts;
+	}
+	
+	public void setCustomerContracts(List<CustomerContract> customerContracts) {
+		this.customerContracts = customerContracts;
+	}
+
 	@Override
 	public String toString() { 
-		String str="SR# " + number + ", Sev " + sev + ", Type "+type+", Product Skill "
-	     + productSkill + ", FL " + fl + " FL Name, " + flName;
+		String str="SR# " + number + " \nDescription " +description+"\nSev " + sev + "\nType "+type+"\nProduct Skill "
+	     + productSkill + "\nFL " + fl +"" +"\nFL Name " + flName + "\nProduct " + productEntitled + "\nAccount " + account;
 		return str;
 	}
+	
 	
 }

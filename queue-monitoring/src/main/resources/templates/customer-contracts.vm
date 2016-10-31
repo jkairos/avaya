@@ -1,0 +1,48 @@
+<html>
+	<head></head>
+	<body>
+		SRs Details:
+		<p>SR #: <a href="https://report.avaya.com/siebelreports/casedetails.aspx?case_id=$!sr.number">$!sr.number</a>
+		<br>Severity: $!sr.sev
+		<br>Type: $!sr.type
+		<br>FL: <a href="https://report.avaya.com/siebelreports/fldrill.aspx?site_id=00$!sr.fl">00$!sr.fl</a>
+		<br>FL Name: $!sr.flName
+		<br>Product Skill: $!sr.productSkill
+		<br>Product: $!sr.productEntitled
+		<br>Description: $!sr.description
+		<br>Account: $!sr.account
+		<br>Country: $!sr.country
+		
+		<p>Following the list of contracts found for the customer $!sr.account:
+		<p>
+		<table>
+			<tr>
+			    <th>Region</th>
+			    <th>Country</th>
+			    <th>Status></th>
+			    <th>FL</th>
+			    <th>Sold To Name</th>
+			    <th>Customer Name/End User</th>
+			    <th>Start Last Renewed</th>
+			    <th>End</th>
+			    <th>Solution Application</th>
+			    <th>Aps Supp Description</th>
+			</tr>
+			#foreach ($customerContract in $!customerContracts)
+			    <tr>
+			        <td>$!customerContract.region</td>
+			        <td>$!customerContract.country</td>
+			        <td>$!customerContract.status</td>
+			        <td>$!customerContract.fl</td>
+			        <td>$!customerContract.soldToName</td>
+			        <td>$!customerContract.customerNameEndUser</td>
+			        <td>$!customerContract.startLastRenewed</td>
+			        <td>$!customerContract.endContract</td>
+			        <td>$!customerContract.solutionApplication</td>
+			        <td>$!customerContract.apsSuppDescription</td>
+			    </tr>
+			#end
+			</table> 
+			<H3> Responsible for the Queue Monitoring Slot please determine either if the Customer is entitled or not </H3>
+	</body>
+</html>

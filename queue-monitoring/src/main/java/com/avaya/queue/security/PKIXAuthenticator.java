@@ -16,7 +16,8 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
 
-import com.avaya.queue.Constants;
+import com.avaya.queue.util.Constants;
+import com.avaya.queue.util.QueueMonitoringProperties;
 
 public class PKIXAuthenticator {
 	
@@ -94,10 +95,13 @@ public class PKIXAuthenticator {
 		/*
 		 * end of the fix
 		 */
-
+			
+		final String username=QueueMonitoringProperties.getProperty("username.queue");
+		final String password=QueueMonitoringProperties.getProperty("password.queue");
+		
 		Authenticator.setDefault(new Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(Constants.USERNAME, Constants.PASSWORD.toCharArray());
+				return new PasswordAuthentication(username,password.toCharArray());
 			}
 		});		
 	}
