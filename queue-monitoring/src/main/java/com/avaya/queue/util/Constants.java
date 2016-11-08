@@ -11,8 +11,8 @@ public class Constants {
 	public static final String ID_PRODUCT_ENTITLEMENT="lProduct";
 	public static final String ID_SR_DESCRIPTION="lCASEDESCRIPTION";
 	public static final String ID_ACCOUNT="lSiteName";
-	public static final String CONTRACTS_CSV=PROJECT_PATH+"contracts/only-contracts.csv";
-	public static final String CONTRACTS_XLSX=PROJECT_PATH+"contracts/only-contracts.xlsx";
+	public static final String CONTRACTS_CSV=PROJECT_PATH+"contracts/only-contractsv2.csv";
+	public static final String CONTRACTS_XLSX=PROJECT_PATH+"contracts/only-contractsv2.xlsx";
 	public static final String SR_DETAILS_URL="https://report.avaya.com/siebelreports/casedetails.aspx?case_id=";
 //	public static final String APACHE_SOLR_URL="http://localhost:8983/solr/avaya";
 }

@@ -101,7 +101,22 @@ public class QueueJob extends QuartzJobBean {
 		} else {// Could not find by FL, then tries by customer name, status and
 				// solution @TODO
 				// needs to be implemented
-			queryString = "'" + sr.getAccount() + "' AND status:'Open' ANS ";
+			queryString = "+'" + sr.getAccount() + "' AND status:'Open'";
+			response = this.getQueryResponse(queryString);
+			results = response.getResults();
+			if (!results.isEmpty()) {
+				for (int i = 0; i < results.size(); ++i) {
+					if (logger.isDebugEnabled()) {
+						logger.debug(results.get(i));
+					}
+
+					SolrDocument solrDocument = results.get(i);
+					Set<String> keys = solrDocument.keySet();
+					customerContracts.add((CustomerContract) this.instantiateObjectViaRefletion(new CustomerContract(),
+							keys, solrDocument));
+				}
+
+			}
 		}
 
 		sr.setCustomerContracts(customerContracts);
