@@ -13,7 +13,6 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
-import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -205,7 +204,8 @@ public class AsyncEmailer extends Thread {
 		AsyncEmailer build = new AsyncEmailer();
 		build.setSubject(subject);
 		build.setText(text);
-		build.setHtml("<html><body><pre>\n" + text + "\n</pre></body></html>");
+		build.setHtml(text);
+//		build.setHtml("<html><body><pre>\n" + text + "\n</pre></body></html>");
 		return build;
 	}
 
@@ -215,7 +215,8 @@ public class AsyncEmailer extends Thread {
 		build.setTo(to);
 		build.setSubject(subject);
 		build.setText(text);
-		build.setHtml("<html><body><pre>\n" + text + "\n</pre></body></html>");
+		build.setHtml(text);
+//		build.setHtml("<html><body><pre>\n" + text + "\n</pre></body></html>");
 		return build;
 	}
 

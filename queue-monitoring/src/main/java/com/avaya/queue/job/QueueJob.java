@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -18,23 +19,43 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import com.avaya.queue.QueueMonitoringDownloader;
 import com.avaya.queue.SRDetailsDownloader;
+import com.avaya.queue.app.QueueMonitoringApp;
+import com.avaya.queue.dao.CustomerContractDao;
+import com.avaya.queue.dao.NotificationDao;
 import com.avaya.queue.entity.CustomerContract;
+import com.avaya.queue.entity.Notification;
 import com.avaya.queue.entity.SR;
 import com.avaya.queue.util.AsyncEmailer;
 import com.avaya.queue.util.Constants;
 import com.avaya.queue.util.QueueMonitoringProperties;
+import com.avaya.queue.util.Settings;
 
 public class QueueJob extends QuartzJobBean {
 	private final static Logger logger = Logger.getLogger(QueueJob.class);
 	private SRDetailsDownloader srDetaildDownloader = new SRDetailsDownloader();
 	private QueueMonitoringDownloader getUrlContent = new QueueMonitoringDownloader();
 	private SolrClient solr;
+	private CustomerContractDao customerContractDao;
+//	private AtomicBoolean isEmptyQueueNotificationSend = new AtomicBoolean(false);
+//	private DateTime emptyQueueNotificationTime;
+
+	public CustomerContractDao getCustomerContractDao() {
+		return customerContractDao;
+	}
+
+	@Autowired
+	public void setCustomerContractDao(CustomerContractDao customerContractDao) {
+		this.customerContractDao = customerContractDao;
+	}
 
 	@Override
 	protected void executeInternal(JobExecutionContext jobContext) throws JobExecutionException {
@@ -45,7 +66,7 @@ public class QueueJob extends QuartzJobBean {
 	}
 
 	private void cleanup() {
-		File file = new File(Constants.PROJECT_PATH + File.separator + "res");
+		File file = new File(Constants.APP_PATH + File.separator + "res");
 		if (file.exists()) {
 			File[] files = file.listFiles();
 			for (File file2 : files) {
@@ -56,28 +77,92 @@ public class QueueJob extends QuartzJobBean {
 
 	private void processQueue() {
 		getUrlContent.readUrl();
-		List<SR> queueList = getUrlContent.processFile();
+		NotificationDao noticiationDao = (NotificationDao) QueueMonitoringApp.context.getBean("notificationDao");
+
+		List<SR> queueList = getUrlContent.getQueueList();
 		if (logger.isDebugEnabled()) {
 			logger.debug("Current Queue Size: " + queueList.size());
 		}
 		if (queueList != null && !queueList.isEmpty()) {
-			srDetaildDownloader.processSRDetails(queueList);
-			for (SR sr : queueList) {
-				this.setSRCustomerContracts(sr);
-				if (logger.isDebugEnabled()) {
-					logger.debug("SR INFORMATION: " + sr.toString());
-				}
-				this.sendEmail(sr);
-			}
-		} else {
 			if (logger.isDebugEnabled()) {
-				logger.debug("...............QUEUE IS EMPTY.......... ");
-				this.sendEmail(null);
+				logger.debug("QUEUE IS NOT EMPTY");
+			}
+			srDetaildDownloader.getSRDetails(queueList);
+			Notification notification = null;
+			for (SR sr : queueList) {
+				String srNumber = sr.getNumber();
+				notification = noticiationDao.findBySr(srNumber);
+
+				if (notification == null) {// 1st time the notification is being sent
+					if (logger.isDebugEnabled()) {
+						logger.debug("SET CUSTOMER CONTRACTS DB");
+					}
+					this.setSRCustomerContractsDb(sr);
+					if (logger.isDebugEnabled()) {
+						logger.debug("SR INFORMATION: " + sr.toString());
+					}
+					this.sendEmail(sr);
+					if (logger.isDebugEnabled()) {
+						logger.debug("EMAIL SENT");
+					}
+					noticiationDao.insert(srNumber);
+				} else {
+					if (logger.isDebugEnabled()) {
+						logger.debug("EMAIL HAS ALREADY BEEN SENT");
+					}
+					// Notification has been sent already, however not one has
+					// owned the SR yet, so we wait an interval to resend the
+					// email
+					DateTime notifcationDateSent = notification.getNotificationDate();
+					DateTime now = new DateTime();
+					int minutes = Minutes.minutesBetween(notifcationDateSent,now).getMinutes();
+					int configIntervalToResendEmail = 1440;//24 hours
+					try{
+						if(sr.getSev().equalsIgnoreCase(Constants.SBI)){
+							configIntervalToResendEmail=Integer.valueOf(Settings.getString(Constants.SBI_INTERVAL));
+						}else if(sr.getSev().equalsIgnoreCase(Constants.BI)){
+							configIntervalToResendEmail=Integer.valueOf(Settings.getString(Constants.BI_INTERVAL));
+						}else if(sr.getSev().equalsIgnoreCase(Constants.NSI)){
+							configIntervalToResendEmail=Integer.valueOf(Settings.getString(Constants.NSI_INTERVAL));
+						}
+						
+					}catch(Exception e){
+						configIntervalToResendEmail = 1440;//24 hours
+					}
+					
+					if (minutes > configIntervalToResendEmail) {
+						this.setSRCustomerContractsDb(sr);
+						if (logger.isDebugEnabled()) {
+							logger.debug("SR INFORMATION: " + sr.toString());
+						}
+						this.sendEmail(sr);
+						noticiationDao.update(srNumber);
+					}
+				}
 			}
 		}
+		//IF THE QUEUE IS EMPTY WE ARE NOT SENDING EMAILS ANYMORE
+		/* else {
+			if (logger.isDebugEnabled()) {
+				logger.debug("...............QUEUE IS EMPTY.......... ");
+				if (!isEmptyQueueNotificationSend.get()) {
+					this.sendEmail(null);
+					isEmptyQueueNotificationSend.set(true);
+					emptyQueueNotificationTime = new DateTime();
+				} else {
+					DateTime now = new DateTime();
+					int minutes = Minutes.minutesBetween(emptyQueueNotificationTime,now).getMinutes();
+					int configIntervalToResendEmail = 30;//30 mins if empty
+					if (minutes > configIntervalToResendEmail) {
+						isEmptyQueueNotificationSend.set(false);
+						emptyQueueNotificationTime = null;
+					}
+				}
+			}
+		}*/
 	}
 
-	private void setSRCustomerContracts(SR sr) {
+	private void setSRCustomerContractsSolr(SR sr) {
 		String queryString = "fl:'" + sr.getFl() + "' AND status:'Open'";
 		QueryResponse response = this.getQueryResponse(queryString);
 		if (logger.isDebugEnabled()) {
@@ -117,6 +202,21 @@ public class QueueJob extends QuartzJobBean {
 				}
 
 			}
+		}
+
+		sr.setCustomerContracts(customerContracts);
+
+	}
+
+	private void setSRCustomerContractsDb(SR sr) {
+		customerContractDao = (CustomerContractDao) QueueMonitoringApp.context.getBean("customerContractDao");
+		List<CustomerContract> customerContracts = customerContractDao.findByFl(sr.getFl());
+
+		if (customerContracts == null || customerContracts.isEmpty()) {
+			// Could not find by FL, then tries by customer name, status and
+			// solution @TODO
+			// needs to be implemented
+			customerContracts = customerContractDao.findByName(sr);
 		}
 
 		sr.setCustomerContracts(customerContracts);
@@ -176,46 +276,50 @@ public class QueueJob extends QuartzJobBean {
 		 */
 		VelocityEngine ve = new VelocityEngine();
 		ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "file");
-//		ve.setProperty("classpath.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-		ve.setProperty("file.resource.loader.path", Constants.PROJECT_PATH+"templates");
+		// ve.setProperty("classpath.resource.loader.class",
+		// "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+		ve.setProperty("file.resource.loader.path", Constants.APP_PATH + "templates");
 		ve.init();
 		Template template = null;
+		boolean contractFound=false;
 		
-		if(sr!=null && !sr.getCustomerContracts().isEmpty()){
-			template=ve.getTemplate("customer-contracts.vm");
-		}else if(sr!=null && sr.getCustomerContracts().isEmpty()){
-			template=ve.getTemplate("no-contracts-found.vm");
-		}else{
-			template=ve.getTemplate("queue-empty.vm");
+		if (sr != null && !sr.getCustomerContracts().isEmpty()) {
+			template = ve.getTemplate("customer-contracts.vm");
+			contractFound=true;
+		} else if (sr != null && sr.getCustomerContracts().isEmpty()) {
+			template = ve.getTemplate("no-contracts-found.vm");
+			contractFound=false;
+		} else {
+			template = ve.getTemplate("queue-empty.vm");
 		}
-		
+
 		/**
 		 * Prepare context data
 		 */
 		VelocityContext context = new VelocityContext();
-		if(sr!=null){
+		if (sr != null) {
 			context.put("sr", sr);
 			context.put("customerContracts", sr.getCustomerContracts());
+			context.put("caseEntries", sr.getCaseEntries());
 		}
-		
+
 		/**
 		 * Merge data and template
 		 */
 		StringWriter swOut = new StringWriter();
 		template.merge(context, swOut);
-		
-        String message=swOut.toString();
-        String subject=null;
-        
-		if(sr!=null){
-			subject=sr.getNumber() + " - " + sr.getAccount() + " - " +sr.getProductEntitled();
-		}else{
-			subject="Queue is Empty";
+
+		String message = swOut.toString();
+		String subject = null;
+		if (sr != null) {
+			subject = "QPC " +(sr.getType().equalsIgnoreCase("Collaboration")?" - COLLABORATION - ":" - ")+(contractFound ? "Contract Found / ": "No Valid Contract Found / ")+ sr.getNumber() + " / " + sr.getAccount() + " / "
+					+ sr.getProductEntitled() + " / " + sr.getDescription();
+		} else {
+			subject = "QPC  - Queue is Empty";
 		}
-		
+
 		AsyncEmailer.getInstance(subject, message).start();
-		
-		System.out.println(swOut);
+
 	}
 
 }

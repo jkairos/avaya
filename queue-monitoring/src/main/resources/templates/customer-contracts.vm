@@ -1,79 +1,246 @@
 <html>
 	<head>
-	  <style>
-	  	 element.style {
- 		   width: 10%;
-		 }
-	     
-	     .tableBorder {
-		    border-color: black;
-		    border-style: solid;
-		    border-width: 1px 2px 2px 1px;
-		    color: black;
-		    font-family: Verdana;
-		    font-size: 11px;
-		    font-weight: normal;
-		    padding: 1px;
-		}
-		.headRowV3 {
-		    background-color: #4b80b6;
-		    color: White;
-		    font-family: Verdana;
-		    font-size: 11px;
-		    font-weight: bold;
-		    padding: 1px;
-		    vertical-align: top;
-		}
-		.blacktext {
-		    color: #000000;
-		    font-family: verdana;
-		    font-size: 11px;
-		    font-weight: normal;
-		}
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	  	<style>
+				body {color: #ffffff; margin: 0; padding: 0;}
+				table.messageContainer {width: 560px; margin: 0; padding: 0;}
+				table.employeeMessageContainer {width: 100%; padding: 0; border: 0; border-collapse: collapse;}
+				td.spacerContainer {width: 35px; margin: 0; padding: 0;}
+				td.fullNoBorderContainer {width: 100%; margin: 0; padding: 0; border: none; color:#000000}
+				td.fullNoBorderContainer {text-align: center; vertical-align: middle; }
+				td.fullNoBorderContainer {font-weight: normal; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt;}
+				td.fullBorderContainer {width: 100%; margin: 0; padding: 0; border: ridge; color:#000000}				
+				td.fullBorderContainer {text-align: left; vertical-align: middle;}
+				td.fullBorderContainer {font-weight: normal; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt;}
+				td.meaFullBorderContainer {width: 100%; margin: 0; padding: 0; border: ridge; background-color: #CC3300; color: #eeeee0;}
+                td.meaFullBorderContainer {text-align: left; vertical-align: middle;}
+                td.meaFullBorderContainer {font-weight: normal; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt;}
+				td.Container {width: 100%; margin: 0; padding: 0; border: ridge; }
+				td.bodyContainer {width: 525px; margin: 0; padding: 0;}
+				table.bodyContainer {width: 525px; margin: 0; padding: 0;}
+				tr.bannerContainer {width: 525px; margin: 0; padding: 0;}
+				td.logoContainer {width: 205px; margin: 0; padding: 0 0 10px 0; height:110px; vertical-align: bottom; }
+				td.typeContainer {width: 305px; margin: 0; padding: 0 0 10px 15px; height:110px; vertical-align: bottom; }
+				td.employeeLabelContainer {width: 33%; margin: 0; padding: 0; text-align: left; vertical-align: middle; border-style: ridge;}
+				td.employeeLabelContainer {font-weight: normal; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color: #000000; }
+				td.employeeValueContainer {width: 67%; margin: 0; padding: 0; text-align: left; vertical-align: middle; border-style: ridge;}
+				td.employeeValueContainer {font-weight: normal; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt;color: #000000; }
+				span.legalHeader { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; text-decoration: underline; font-weight: bold; color: #000000;}
+				span.legalFooter { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; font-weight: bold; color: #000000;}
+				span.respond { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color: #000000;}
+				span.TopFive { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14pt; font-weight: bold; color: #c60808;}
+				span.passwordLegalHeader { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; font-weight: bold; color: #000000;}
+				span.passwordBold { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; font-weight: bold; color: #000000;}
+				span.passwordNormal { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color: #000000;}
+				td.typeContainer {background-color: #ff660A; }
+				td.fullBorderContainer {background-color: #ff660A; color: #eeeee0;}
+				tr.contentContainer {width: 525px; font-family: Arial; font-size: 11px; size: 1;}
+				td.preAmbleContainer {width:525px; padding: 35px 20px 15px 0px; color: #666666;}
+				p.preAmbleContainer {width:525px; font-family: Arial; font-size: 9px; padding: 35px 20px 15px 0px; color: #666666;}
+				table.dataContainer {width:525px; padding-bottom: 25px; color: #333333; border: 1px; border-style: solid; border-color: #e8e8e8; border-collapse: collapse; }
+				tr.dataElementContainer {display:table-row; width: 525px; vertical-align: middle; font-family: Arial; font-size: 11px; }
+				td.dataWrapperContainer {padding-bottom: 25px;}
+				td.dataLabelContainer {width: 185px; padding: 8px 0px 8px 20px; border: 1px; border-style: solid; border-color: #e8e8e8; border-collapse: collapse; vertical-align: middle;}
+				td.dataValueContainer {width: 298px; padding: 8px 0px 8px 20px; border: 1px; border-style: solid; border-color: #e8e8e8; border-collapse: collapse; vertical-align: middle;}
+				td.dataNoteContainer {width: 525px; padding: 8px 0px 8px 20px; border: 1px; border-style: solid; border-color: #e8e8e8; border-collapse: collapse; vertical-align: middle;}
+				td.generationLabelContainer {width: 525px; padding: 8px 0px 8px 20px; border: 1px; border-style: solid; border-color: #e8e8e8; border-bottom: 0px none; border-collapse: collapse; vertical-align: middle;}
+				td.generationValueContainer {width: 525px; padding: 0px 0px 8px 50px; border: 1px; border-style: solid; border-color: #e8e8e8; border-top: 0px none; border-collapse: collapse; vertical-align: middle;}
+				td.notificationNoteContainer {width: 525px; padding-bottom: 15px; size: 2;font-family: Arial; font-size: 11px; color: #666666;}
+				td.doNotReplyNoteContainer {width: 525px; padding-bottom: 10px; size: 2;font-family: Arial; font-size: 11px; color: #999999;}
+				td.empSubLabelContainer {width: 100%; margin: 0; padding: 0 0 8px 0; border: ridge; color:#000000; border-collapse: collapse;}
+				td.empSubLabelContainer {text-align: left; vertical-align: middle; font-weight: normal; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt;}
+				td.empSubValueContainer {width: 100%; margin: 0; padding: 0 0 0 50px; border: ridge; border-top: 0px none; color:#000000; border-collapse: collapse;}
+				td.empSubValueContainer {text-align: left; vertical-align: middle; font-weight: normal; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt;}
+				td.form { text-align: left; font-weight: normal; padding-left: 20px; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color:#000000}
+				td.formcenter { text-align: center; font-weight: normal; padding-left: 20px; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color:#000000}
+				input.button { font-weight: normal; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color:#000000}
+				img.avayaLogo {width: 119px; height: 35px; display:block; border:none; } 
+				img.spacer {width: 35px; height: 35px;  _vertical-align: bottom;}
+				font.serviceRequestTitle {font-family: Arial; font-size: 15px; color: #ffffff; font-weight: bold; }
+				font.notificationType {font-family: Arial; font-size:28px; font-weight:normal; }
+				font.specialNotes {font-family: Arial; font-size:11px; font-weight:normal; color: #666666;}
+				a {text-decoration: underline; color: #486580; font-weight: bold; }
+				a.specialLinks {font-weight: bold; font-size: 16px;}	  
+			  	
+			  	element.style {
+		 		   width: 10%;
+				}
+			     
+			    .tableBorder {
+				    border-color: black;
+				    border-style: solid;
+				    border-width: 1px 2px 2px 1px;
+				    color: black;
+				    font-family: Verdana;
+				    font-size: 11px;
+				    font-weight: normal;
+				    padding: 1px;
+				}
+				.headRowV3 {
+				    background-color: #4b80b6;
+				    color: White;
+				    font-family: Verdana;
+				    font-size: 11px;
+				    font-weight: bold;
+				    padding: 1px;
+				    vertical-align: top;
+				}
+				.blacktext {
+				    color: #000000;
+				    font-family: verdana;
+				    font-size: 11px;
+				    font-weight: normal;
+				}
 	  </style>
 	</head>
 	<body>
-		<H3> Responsible for the Queue Monitoring Slot please determine either if the Customer is entitled or not </H3>
-		<H4>SRs Details:</H4>
-		<br>SR #: <a href="https://report.avaya.com/siebelreports/casedetails.aspx?case_id=$!sr.number">$!sr.number</a>
-		<br>Severity: $!sr.sev
-		<br>Type: $!sr.type
-		<br>FL: <a href="https://report.avaya.com/siebelreports/fldrill.aspx?site_id=00$!sr.fl">00$!sr.fl</a>
-		<br>FL Name: $!sr.flName
-		<br>Product Skill: $!sr.productSkill
-		<br>Product: $!sr.productEntitled
-		<br><b>Description: $!sr.description</b>
-		<br>Account: $!sr.account
-		<br>Country: $!sr.country
-		
-		<b>Following the list of contracts found for the customer $!sr.account:</b>
+	    <table class="employeeMessageContainer">
+			<tr>
+	         <td class="fullNoBorderContainer" colspan="2">
+	         	<b><font color="#0000ff"> CONTRACTS FOUND FOR CUSTOMER $!sr.account</font>.
+	         	RESPONSIBLE FOR THE QUEUE MONITORING SLOT PLEASE DETERMINE CUSTOMER'S ENTITLEMENT</b>
+	         </td>
+	        </tr>
+	        <tr>
+	        	<td>&nbsp;</td>
+	        </tr>
+		    <tr>
+		       <td class="fullBorderContainer" colspan="2"><b>Service Request Details</b></td>
+		    </tr>
+		    <tr>
+         		<td class="employeeLabelContainer"><b>Service Request ID</b></td>
+         		<td class="employeeValueContainer">
+         			<a href="https://report.avaya.com/siebelreports/casedetails.aspx?case_id=$!sr.number">$!sr.number</a>
+         		</td>
+         	</tr>
+		    <tr>
+		        <td class="employeeLabelContainer" style="background-color: yellow; color: black"><b>Business Severity</b></td>
+		        <td class="employeeValueContainer" style="background-color: yellow; color: black">$!sr.severity</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Type</b></td>
+		        <td class="employeeValueContainer">$!sr.type</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer" style="background-color: yellow; color: black"><b>Security Restricted</b></td>
+		        <td class="employeeValueContainer" style="background-color: yellow; color: black">#if($!sr.securityRestricted) YES #else NO #end</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>FL</b></td>
+		        <td class="employeeValueContainer"><a href="https://report.avaya.com/siebelreports/fldrill.aspx?site_id=00$!sr.fl">00$!sr.fl</a></td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>FL Name:</b></td>
+		        <td class="employeeValueContainer">$!sr.flName</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Parent Name:</b></td>
+		        <td class="employeeValueContainer">$!sr.parentName</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Product Skill</b></td>
+		        <td class="employeeValueContainer">$!sr.productSkill</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Product</b></td>
+		        <td class="employeeValueContainer">$!sr.productEntitled</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer" style="background-color: yellow; color: black"><b>Description</b></td>
+		        <td class="employeeValueContainer" style="background-color: yellow; color: black"> $!sr.description</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Account</b></td>
+		        <td class="employeeValueContainer">$!sr.account</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Country</b></td>
+		        <td class="employeeValueContainer">$!sr.country</td>
+		    </tr>
+		</table>
+		<br>
+		<br>	
+   		<table class="employeeMessageContainer">
+   			<tr>
+   				<td>
+   					<span class="legalFooter"> 
+   						Following the list of contracts found for the customer <font color="#0000ff"> <b>$!sr.account: </b></font>
+   					</span>
+   				</td>
+   			</tr>
+   		</table>
 		<table class="tableBorder" width="100%" cellspacing="0">
 			<tr class="headRowV3">
-			    <th>Region</th>
-			    <th>Country</th>
+			    <th>Country/Region</th>
 			    <th>Status</th>
 			    <th>FL</th>
 			    <th>Sold To Name</th>
 			    <th>Customer Name/End User</th>
-			    <th>Start Last Renewed</th>
-			    <th>End</th>
+			    <th>Start Last Renewed/END</th>
 			    <th>Solution Application</th>
 			    <th>Aps Supp Description</th>
 			</tr>
 			#foreach ($customerContract in $!customerContracts)
 			    <tr>
-			        <td class="blacktext" style="text-align:left; background-color:#E6E6E6">$!customerContract.region</td>
-			        <td class="blacktext" style="text-align:left; background-color:#E6E6E6">$!customerContract.country</td>
-			        <td class="blacktext" style="text-align:left; background-color:#E6E6E6">$!customerContract.status</td>
-			        <td class="blacktext" style="text-align:left; background-color:#E6E6E6">$!customerContract.fl</td>
-			        <td class="blacktext" style="text-align:left; background-color:#E6E6E6">$!customerContract.soldToName</td>
-			        <td class="blacktext" style="text-align:left; background-color:#E6E6E6">$!customerContract.customerNameEndUser</td>
-			        <td class="blacktext" style="text-align:left; background-color:#E6E6E6">$!customerContract.startLastRenewed</td>
-			        <td class="blacktext" style="text-align:left; background-color:#E6E6E6">$!customerContract.endContract</td>
-			        <td class="blacktext" style="text-align:left; background-color:#E6E6E6">$!customerContract.solutionApplication</td>
-			        <td class="blacktext" style="text-align:left; background-color:#E6E6E6">$!customerContract.apsSuppDescription</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end">$!customerContract.country/$!customerContract.region</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end">$!customerContract.status</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end">$!customerContract.fl</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end">$!customerContract.soldToName</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end">$!customerContract.customerNameEndUser</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end">$!customerContract.startLastRenewed  $!customerContract.endContract</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end">$!customerContract.solutionApplication</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end">$!customerContract.apsSuppDescription</td>
 			    </tr>
 			#end
-			</table> 
+		</table> 
+		<br>
+   		<table class="employeeMessageContainer">
+   			<tr>
+   				<td>
+   					<span class="legalFooter"> 
+   						<b>SR NOTES</b>
+   					</span>
+   				</td>
+   			</tr>
+   		</table>
+		<table class="tableBorder" width="100%" cellspacing="0">
+			<tr class="headRowV3">
+			    <th>Type</th>
+			    <th>Created By</th>
+			    <th>Date Created</th>
+			    <th>Status</th>
+			    <th>Private</th>
+			    <th>Assignment Time</th>
+			    <th>Owner</th>
+			</tr>
+			#foreach ($activity in $!caseEntries)
+			    <tr>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end"><b>$!activity.type</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end"><b>$!activity.createdBy</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end"><b>$!activity.dateCreated</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end"><b>$!activity.status</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end"><b>$!activity.privateNote</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end"><b>$!activity.assignmentTime</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end"><b>$!activity.owner</b></td>
+			    </tr>
+			    <tr>
+			      <td colspan="7" class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end">$!activity.description</td>
+			    </tr>
+			#end
+		</table>
+		<br>
+		<br>	
+   		<table class="employeeMessageContainer">
+   			<tr>
+         		<td class="empSubLabelContainer">
+         			<b>* This notification was generated by the Queue Monitoring Application and serves as help for the queue monitoring engineer, who must verify the determine the entitlement of the customer </b>
+         			<br>
+         			<br>
+         			<span class="legalFooter">
+						<font color="#ff0000">CONFIDENTIALITY NOTICE:</font><br>This notification message is for the sole use of the intended recipient(s) and contains confidential and proprietary company information.  Any unauthorized review, use, disclosure or distribution especially  to Customers or Business Partners is strictly prohibited<font color="#0000ff"> and is a Code of Conduct violation</font>.
+				    </span>
+         		</td>
+      		</tr>
+   		</table>
 	</body>
 </html>

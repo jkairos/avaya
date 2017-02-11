@@ -21,8 +21,18 @@ public class SR {
 	private String country;
 	private int otherSrs;
 	private String account;
+	private String severity;
 	private List<CustomerContract> customerContracts;
+	private List<Activity> caseEntries;
+	private boolean securityRestricted;
+	private String parentName;
 	
+	public String getSeverity() {
+		return severity;
+	}
+	public void setSeverity(String severity) {
+		this.severity = severity;
+	}
 	public String getNumber() {
 		return number;
 	}
@@ -141,7 +151,30 @@ public class SR {
 	public void setCustomerContracts(List<CustomerContract> customerContracts) {
 		this.customerContracts = customerContracts;
 	}
+	
+	
+	public boolean isSecurityRestricted() {
+		return securityRestricted;
+	}
+	public void setSecurityRestricted(boolean securityRestricted) {
+		this.securityRestricted = securityRestricted;
+	}
+	
+	public List<Activity> getCaseEntries() {
+		return caseEntries;
+	}
+	public void setCaseEntries(List<Activity> caseEntries) {
+		this.caseEntries = caseEntries;
+	}
+	
+	public String getParentName() {
+		return parentName;
+	}
 
+	public void setParentName(String parentName) {
+		this.parentName = parentName;
+	}
+	
 	@Override
 	public String toString() { 
 		String str="SR# " + number + " \nDescription " +description+"\nSev " + sev + "\nType "+type+"\nProduct Skill "

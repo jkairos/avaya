@@ -3,11 +3,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>avaya.com</groupId>
 	<artifactId>queue-monitoring</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 
 	<properties>
 		<springframework.version>4.1.6.RELEASE</springframework.version>
+		<hsqldb.version>2.3.4</hsqldb.version>
 		<quartz.version>2.2.1</quartz.version>
+		<dbcp.version>2.1.1</dbcp.version>
+		<jdk.version>1.6</jdk.version>
 	</properties>
 
 	<dependencies>
@@ -60,6 +63,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 			<version>${springframework.version}</version>
 		</dependency>
@@ -73,6 +81,17 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
 			<version>${springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>${hsqldb.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-dbcp2</artifactId>
+			<version>${dbcp.version}</version>
 		</dependency>
 		<!-- Quartz framework -->
 		<dependency>
@@ -92,16 +111,57 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<finalName>qpc</finalName>
 		<pluginManagement>
 			<plugins>
+				<!-- download source code in Eclipse, best practice -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-eclipse-plugin</artifactId>
+					<version>2.9</version>
+					<configuration>
+						<downloadSources>true</downloadSources>
+						<downloadJavadocs>false</downloadJavadocs>
+					</configuration>
+				</plugin>
+				<!-- Set a compiler level -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.2</version>
+					<version>2.3.2</version>
 					<configuration>
-						<source>1.6</source>
-						<target>1.6</target>
+						<source>${jdk.version}</source>
+						<target>${jdk.version}</target>
 					</configuration>
+				</plugin>
+
+				<!-- Maven Assembly Plugin -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.5</version>
+					<configuration>
+						<!-- get all project dependencies -->
+						<descriptorRefs>
+							<descriptorRef>jar-with-dependencies</descriptorRef>
+						</descriptorRefs>
+						<!-- MainClass in manifest make a executable jar -->
+						<archive>
+							<manifest>
+								<mainClass>com.avaya.queue.app.QueueMonitoringApp</mainClass>
+							</manifest>
+						</archive>
+					</configuration>
+					<executions>
+						<execution>
+							<id>make-assembly</id>
+							<!-- bind to the packaging phase -->
+							<phase>package</phase>
+							<goals>
+								<goal>single</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>

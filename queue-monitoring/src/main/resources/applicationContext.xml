@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/jdbc
+	http://www.springframework.org/schema/jdbc/spring-jdbc-4.1.xsd
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+
+	<bean id="customerContractDao" class="com.avaya.queue.dao.CustomerContractDaoImpl">
+		<property name="namedParameterJdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+
+	<bean id="notificationDao" class="com.avaya.queue.dao.NotificationDaoImpl">
+		<property name="namedParameterJdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+	
+	<!-- jdbc:hsqldb:mem:dataSource -->
+	<jdbc:embedded-database id="dataSource" type="HSQL">
+		<jdbc:script location="file:///Users/jferreira/qpc/db/create-db.sql" />
+		<jdbc:script location="file:///Users/jferreira/qpc/db/insert-data.sql" />
+	</jdbc:embedded-database>
+
+	<bean id="jdbcTemplate"
+		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+		<constructor-arg ref="dbcpDataSource" />
+	</bean>
+
+	<bean id="dbcpDataSource" class="org.apache.commons.dbcp2.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:hsqldb:mem:dataSource" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean>
+
+	<bean name="queueJob"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.avaya.queue.job.QueueJob" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="jobState" value-ref="jobDataBean" />
+			</map>
+		</property>
+	</bean>
+
+	<bean name="jobDataBean" class="com.avaya.queue.job.MyJobHelper">
+		<constructor-arg index="0">
+			<value>Spring Quartz Example</value>
+		</constructor-arg>
+	</bean>
+
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="cronTrigger" />
+			</list>
+		</property>
+	</bean>
+	<!-- Name Required Allowed Values Allowed Special Characters Seconds Y 0-59 
+		, - * / Minutes Y 0-59 , - * / Hours Y 0-23 , - * / Day of month Y 1-31 , 
+		- * ? / L W C Month Y 0-11 or JAN-DEC , - * / Day of week Y 1-7 or SUN-SAT 
+		, - * ? / L C # Year N empty or 1970-2099 , - * / -->
+	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
+	<bean id="cronTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="queueJob" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<!-- <property name="cronExpression" value="0/180 * * * * ?" /> -->
+	</bean>
+</beans>

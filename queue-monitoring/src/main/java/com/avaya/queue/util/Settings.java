@@ -1,5 +1,7 @@
 package com.avaya.queue.util;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -27,7 +29,7 @@ public class Settings {
     private static void setUp() {
         MAP = new HashMap<String, Object>();
         try {
-            InputStream in = Settings.class.getClassLoader().getResourceAsStream("config.properties");
+            InputStream in = new FileInputStream(Constants.APP_PATH+File.separator+"config.properties");
             if (in != null) {
                 log.info("Reading properties from classpath.");
                 Properties properties = new Properties();
