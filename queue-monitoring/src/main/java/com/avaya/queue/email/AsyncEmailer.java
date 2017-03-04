@@ -1,4 +1,4 @@
-package com.avaya.queue.util;
+package com.avaya.queue.email;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -205,7 +205,8 @@ public class AsyncEmailer extends Thread {
 		build.setSubject(subject);
 		build.setText(text);
 		build.setHtml(text);
-//		build.setHtml("<html><body><pre>\n" + text + "\n</pre></body></html>");
+		// build.setHtml("<html><body><pre>\n" + text +
+		// "\n</pre></body></html>");
 		return build;
 	}
 
@@ -216,7 +217,8 @@ public class AsyncEmailer extends Thread {
 		build.setSubject(subject);
 		build.setText(text);
 		build.setHtml(text);
-//		build.setHtml("<html><body><pre>\n" + text + "\n</pre></body></html>");
+		// build.setHtml("<html><body><pre>\n" + text +
+		// "\n</pre></body></html>");
 		return build;
 	}
 

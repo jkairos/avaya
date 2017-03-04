@@ -19,10 +19,20 @@
 	</bean>
 	
 	<!-- jdbc:hsqldb:mem:dataSource -->
-	<jdbc:embedded-database id="dataSource" type="HSQL">
+	<!-- <jdbc:embedded-database id="dataSource" type="HSQL">
+		<jdbc:script location="file:///root/qpc/db/create-db.sql" />
+		<jdbc:script location="file:///root/qpc/db/insert-data.sql" />
+	</jdbc:embedded-database> -->
+
+	<jdbc:embedded-database id="dataSource" type="HSQL"> 
+		<jdbc:script location="classpath:/db/create-db.sql" />
+		<jdbc:script location="classpath:/db/insert-data.sql" />
+	</jdbc:embedded-database> 
+
+	<!--  <jdbc:embedded-database id="dataSource" type="HSQL">
 		<jdbc:script location="file:///Users/jferreira/qpc/db/create-db.sql" />
 		<jdbc:script location="file:///Users/jferreira/qpc/db/insert-data.sql" />
-	</jdbc:embedded-database>
+	</jdbc:embedded-database> -->
 
 	<bean id="jdbcTemplate"
 		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
@@ -36,39 +46,60 @@
 		<property name="username" value="sa" />
 		<property name="password" value="" />
 	</bean>
-
-	<bean name="queueJob"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+	
+	<bean name="queueJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="com.avaya.queue.job.QueueJob" />
-		<property name="jobDataAsMap">
-			<map>
-				<entry key="jobState" value-ref="jobDataBean" />
-			</map>
-		</property>
+		<property name="durability" value="true" />
 	</bean>
 
-	<bean name="jobDataBean" class="com.avaya.queue.job.MyJobHelper">
-		<constructor-arg index="0">
-			<value>Spring Quartz Example</value>
-		</constructor-arg>
+	<bean name="queuePendingSrsJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.avaya.queue.job.QueuePendingSrsJob" />
+		<property name="durability" value="true" />
+	</bean>
+	
+	<!-- 
+	Name	       Required	      Allowed Values	     Allowed Special Characters
+     Seconds	      Y	               0-59	                   , - * /
+     Minutes	      Y	               0-59	                   , - * /
+     Hours	          Y	               0-23	                   , - * /
+     Day of month	  Y	               1-31	                   , - * ? / L W C
+     Month	          Y	               0-11 or JAN-DEC	       , - * /
+     Day of week	  Y	               1-7 or SUN-SAT	       , - * ? / L C #
+     Year	          N	               empty or 1970-2099	   , - * /  
+	 -->
+	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
+	<bean id="cronTriggerQueueJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="queueJob" />
+		<property name="cronExpression" value="0/30 0/1 * ? * 1-5" />
 	</bean>
 
+	<bean id="cronTriggerQueueJobWeekend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="queueJob" />
+		<property name="cronExpression" value="0/180 0/1 * ? * 6-7" />
+	</bean>
+
+	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
+	<bean id="cronTriggerQueuePendingSrsJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="queuePendingSrsJob" />
+		<property name="cronExpression" value="0 0 0/2 ? * 1-5" />
+	</bean>
+
+	<!-- Scheduler factory bean to glue together jobDetails and triggers to 
+		Configure Quartz Scheduler -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-		<property name="triggers">
+		<property name="jobDetails">
 			<list>
-				<ref bean="cronTrigger" />
+				<ref bean="queueJob" />
+				<ref bean="queuePendingSrsJob" />
 			</list>
 		</property>
-	</bean>
-	<!-- Name Required Allowed Values Allowed Special Characters Seconds Y 0-59 
-		, - * / Minutes Y 0-59 , - * / Hours Y 0-23 , - * / Day of month Y 1-31 , 
-		- * ? / L W C Month Y 0-11 or JAN-DEC , - * / Day of week Y 1-7 or SUN-SAT 
-		, - * ? / L C # Year N empty or 1970-2099 , - * / -->
-	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
-	<bean id="cronTrigger"
-		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-		<property name="jobDetail" ref="queueJob" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
-		<!-- <property name="cronExpression" value="0/180 * * * * ?" /> -->
+
+		<property name="triggers">
+			<list>
+				<ref bean="cronTriggerQueueJobWeekDays" />
+				<ref bean="cronTriggerQueueJobWeekend" />
+				<ref bean="cronTriggerQueuePendingSrsJobWeekDays" />
+			</list>
+		</property>
 	</bean>
 </beans>

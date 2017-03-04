@@ -1,4 +1,4 @@
-package com.avaya.queue.util;
+package com.avaya.queue.email;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +17,8 @@ import javax.naming.NoInitialContextException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.avaya.queue.util.Constants;
+
 /**
  * A wrapper around an internal properties file and JNDI, but overridable
  * programatically for testing or via the command line.
@@ -29,7 +31,12 @@ public class Settings {
     private static void setUp() {
         MAP = new HashMap<String, Object>();
         try {
-            InputStream in = new FileInputStream(Constants.APP_PATH+File.separator+"config.properties");
+            InputStream in = null;
+            try{
+            	in = new FileInputStream(Constants.APP_PATH+File.separator+"config.properties");
+            }catch(IOException ioe){
+            	in = new FileInputStream(Constants.PROJECT_PATH+File.separator+"config.properties");
+            }
             if (in != null) {
                 log.info("Reading properties from classpath.");
                 Properties properties = new Properties();

@@ -32,7 +32,8 @@ public class CustomerContractDaoImpl implements CustomerContractDao {
 				+ " solutionApplication ,"
 				+ " apsSuppMc ,"
 				+ " apsSuppDescription ,"
-				+ " linkToSapContractDoc FROM contracts ";
+				+ " linkToSapContractDoc, "
+				+ " manualDate FROM contracts ";
 	@Autowired
 	public void setNamedParameterJdbcTemplate(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
 		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
@@ -43,7 +44,23 @@ public class CustomerContractDaoImpl implements CustomerContractDao {
 		params.put("fl", fl);
 		params.put("status", "Open");
 		
-		String sql=CustomerContractDaoImpl.SELECT_CLAUSE+ " WHERE fl=:fl and status=:status ";
+		String sql=CustomerContractDaoImpl.SELECT_CLAUSE+ " WHERE fl=:fl and UPPER(status)=UPPER(:status) ";
+		List<CustomerContract> contracts = null;
+		try{
+			contracts = namedParameterJdbcTemplate.query(sql, params, new ContractMapper());
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return contracts;
+	}
+
+	public List<CustomerContract> findByShipTo(String shipTo) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("shipTo", shipTo);
+		params.put("status", "Open");
+		
+		String sql=CustomerContractDaoImpl.SELECT_CLAUSE+ " WHERE shipTo=:shipTo and UPPER(status)=UPPER(:status) ";
 		List<CustomerContract> contracts = null;
 		try{
 			contracts = namedParameterJdbcTemplate.query(sql, params, new ContractMapper());
@@ -63,13 +80,13 @@ public class CustomerContractDaoImpl implements CustomerContractDao {
 		
 		params.put("status", "Open");
 		
-		String sql=CustomerContractDaoImpl.SELECT_CLAUSE+ " WHERE ((soldToName like :name or customerNameEndUser like :name) ";
+		String sql=CustomerContractDaoImpl.SELECT_CLAUSE+ " WHERE ((UPPER(soldToName) like UPPER(:name) or UPPER(customerNameEndUser) like UPPER(:name)) ";
 		
 		if(sr.getParentName()!=null && !sr.getParentName().equals("")){
-			sql+=" or (soldToName like :parentName or customerNameEndUser like :parentName) ";
+			sql+=" or (UPPER(soldToName) like UPPER(:parentName) or UPPER(customerNameEndUser) like UPPER(:parentName)) ";
 		}
 		
-		sql+=" or (commentsAppsSuppTeam like :name)) and status=:status ";
+		sql+=" or (UPPER(commentsAppsSuppTeam) like UPPER(:name))) and UPPER(status)=UPPER(:status) ";
 		
 		List<CustomerContract> contracts = namedParameterJdbcTemplate.query(sql, params, new ContractMapper());
 		

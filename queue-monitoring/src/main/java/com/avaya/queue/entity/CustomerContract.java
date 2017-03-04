@@ -19,6 +19,8 @@ public class CustomerContract {
 	private String apsSuppDescription;
 	private String linkToSapContractDoc;
 	private String id;
+	private String manualDate;
+	
 	public String getRegion() {
 		return region;
 	}
@@ -127,5 +129,10 @@ public class CustomerContract {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+	public String getManualDate() {
+		return manualDate;
+	}
+	public void setManualDate(String manualDate) {
+		this.manualDate = manualDate;
+	}
 }

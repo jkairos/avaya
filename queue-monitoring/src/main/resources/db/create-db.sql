@@ -16,10 +16,12 @@ CREATE TABLE contracts(
    solutionApplication VARCHAR(300),
    apsSuppMc VARCHAR(200),
    apsSuppDescription VARCHAR(300),
-   linkToSapContractDoc VARCHAR(300)
+   linkToSapContractDoc VARCHAR(300),
+   manualDate VARCHAR(50)
 );
 
 CREATE TABLE notification(
 	srNumber VARCHAR(50) PRIMARY KEY,
-	notificationDate TIMESTAMP(2)
+	notificationDate TIMESTAMP(2),
+	reminder INTEGER
 );

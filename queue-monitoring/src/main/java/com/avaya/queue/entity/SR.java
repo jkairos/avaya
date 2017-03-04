@@ -26,6 +26,10 @@ public class SR {
 	private List<Activity> caseEntries;
 	private boolean securityRestricted;
 	private String parentName;
+	private String nameContact;
+	private String phoneContact;
+	private String emailContact;
+	private String prefLanguage;
 	
 	public String getSeverity() {
 		return severity;
@@ -175,6 +179,32 @@ public class SR {
 		this.parentName = parentName;
 	}
 	
+	
+	
+	public String getNameContact() {
+		return nameContact;
+	}
+	public void setNameContact(String nameContact) {
+		this.nameContact = nameContact;
+	}
+	public String getPhoneContact() {
+		return phoneContact;
+	}
+	public void setPhoneContact(String phoneContact) {
+		this.phoneContact = phoneContact;
+	}
+	public String getEmailContact() {
+		return emailContact;
+	}
+	public void setEmailContact(String emailContact) {
+		this.emailContact = emailContact;
+	}
+	public String getPrefLanguage() {
+		return prefLanguage;
+	}
+	public void setPrefLanguage(String prefLanguage) {
+		this.prefLanguage = prefLanguage;
+	}
 	@Override
 	public String toString() { 
 		String str="SR# " + number + " \nDescription " +description+"\nSev " + sev + "\nType "+type+"\nProduct Skill "

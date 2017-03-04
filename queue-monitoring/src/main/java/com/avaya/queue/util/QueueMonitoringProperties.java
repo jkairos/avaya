@@ -2,6 +2,7 @@ package com.avaya.queue.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -13,7 +14,15 @@ public class QueueMonitoringProperties {
 
 		try {
 			props.load(new FileInputStream(Constants.APP_PATH+File.separator+"config.properties"));
-		} catch (IOException e) {
+		} catch (FileNotFoundException e) {
+			try {
+				props.load(QueueMonitoringProperties.class.getClassLoader().getSystemResourceAsStream("config.properties"));
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}catch (Exception e){
 			e.printStackTrace();
 		}
 

@@ -15,6 +15,7 @@ public class NotificationMapper implements RowMapper<Notification> {
 		DateTime notificationDate = new DateTime(result.getTimestamp("notificationDate"));
 		
 		notification.setSrNumber(result.getString("srNumber"));
+		notification.setReminder(result.getInt("reminder"));
 		notification.setNotificationDate(notificationDate);
 
 		return notification;

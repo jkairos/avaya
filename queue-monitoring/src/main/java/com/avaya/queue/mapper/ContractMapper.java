@@ -28,15 +28,25 @@ public class ContractMapper implements RowMapper<CustomerContract> {
 		customerContract.setCommentsAppsSuppTeam(result.getString("commentsAppsSuppTeam"));
 		customerContract.setSapOrder(result.getString("sapOrder"));
 		
-		DateTime dt = new DateTime(result.getDate("startLastRenewed"));
-		customerContract.setStartLastRenewed(fmt.print(dt));
-		dt = new DateTime(result.getDate("endContract"));
-		customerContract.setEndContract(fmt.print(dt));
+		if(result.getDate("startLastRenewed")!=null){
+			DateTime dt = new DateTime(result.getDate("startLastRenewed"));
+			customerContract.setStartLastRenewed(fmt.print(dt));
+		}else{
+			customerContract.setStartLastRenewed(null);
+		}
+
+		if(result.getDate("endContract")!=null){
+			DateTime dt = new DateTime(result.getDate("endContract"));
+			customerContract.setEndContract(fmt.print(dt));
+		}else{
+			customerContract.setEndContract(null);
+		}
 		
 		customerContract.setSolutionApplication(result.getString("solutionApplication"));
 		customerContract.setApsSuppMc(result.getString("apsSuppMc"));
 		customerContract.setApsSuppDescription(result.getString("apsSuppDescription"));
 		customerContract.setLinkToSapContractDoc(result.getString("linkToSapContractDoc"));
+		customerContract.setManualDate(result.getString("manualDate"));
 		
 		return customerContract;
 	}

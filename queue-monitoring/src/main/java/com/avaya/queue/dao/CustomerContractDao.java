@@ -8,4 +8,5 @@ import com.avaya.queue.entity.SR;
 public interface CustomerContractDao {
 	List<CustomerContract> findByFl(String fl);
 	List<CustomerContract> findByName(SR sr);
+	List<CustomerContract> findByShipTo(String shipTo);
 }

@@ -1,4 +1,4 @@
-package com.avaya.queue;
+package com.avaya.queue.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,8 +16,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
-import com.avaya.queue.util.Constants;
 
 public class XlsToCSV {
 	private final static Logger logger = Logger.getLogger(XlsToCSV.class);

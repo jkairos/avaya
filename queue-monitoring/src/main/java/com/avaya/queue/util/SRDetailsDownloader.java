@@ -1,8 +1,9 @@
-package com.avaya.queue;
+package com.avaya.queue.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,25 +24,35 @@ import org.jsoup.select.Elements;
 import com.avaya.queue.entity.Activity;
 import com.avaya.queue.entity.SR;
 import com.avaya.queue.security.PKIXAuthenticator;
-import com.avaya.queue.util.Constants;
 
 public class SRDetailsDownloader {
 	private final static Logger logger = Logger.getLogger(SRDetailsDownloader.class);
 	
 	public List<SR> getSRDetails(List<SR> queueList) {
 		File input = null;
+		Document doc = null;
 		try {
 			this.downloadSrDetails(queueList);
 			
 			for (SR sr : queueList) {
-				input = new File(Constants.RES+sr.getNumber()+".html");	
-				Document doc = Jsoup.parse(input, "UTF-8");
+				try{
+					input = new File(Constants.RES+sr.getNumber()+".html");	
+					doc = Jsoup.parse(input, "UTF-8");
+				}catch(FileNotFoundException e){
+					input = new File(Constants.PROJECT_PATH+"res"+File.separator+sr.getNumber()+".html");	
+					doc = Jsoup.parse(input, "UTF-8");
+				}
 				Element productEntitlement = doc.getElementById(Constants.ID_PRODUCT_ENTITLEMENT);
 				Element srDescription = doc.getElementById(Constants.ID_SR_DESCRIPTION);
 				Element account = doc.getElementById(Constants.ID_ACCOUNT);
 				Element securityRestricted = doc.getElementById(Constants.ID_SECURITY_RESTRICTED);
 				Element severity = doc.getElementById(Constants.ID_SEVERITY);
 				Element parentName = doc.getElementById(Constants.ID_PARENT_NAME);
+				Element contactName = doc.getElementById(Constants.ID_SR_CONTACT_NAME);
+				Element contactPhone = doc.getElementById(Constants.ID_SR_CONTACT_PHONE);
+				Element contactEmail = doc.getElementById(Constants.ID_SR_CONTACT_EMAIL);
+				Element prefLanguage = doc.getElementById(Constants.ID_SR_CONTACT_PREF_LANGUAGE);
+
 				sr.setProductEntitled(productEntitlement.text());
 				sr.setAccount(account.text());
 				sr.setDescription(srDescription.text());
@@ -50,6 +61,10 @@ public class SRDetailsDownloader {
 				String str=securityRestricted.text();
 				sr.setSecurityRestricted(str.equals("Y")?Boolean.TRUE:Boolean.FALSE);
 				sr.setCaseEntries(this.getCaseEntries(sr));
+				sr.setNameContact(contactName.text());
+				sr.setPhoneContact(contactPhone.text());
+				sr.setEmailContact(contactEmail.text());
+				sr.setPrefLanguage(prefLanguage.text());
 			}
 
 		} catch (IOException e) {
@@ -67,7 +82,14 @@ public class SRDetailsDownloader {
 		List<Activity> caseEntriesList = new ArrayList<Activity>();
 		Activity activity = null;
 		try {
-			Document doc = Jsoup.parse(input, "UTF-8");
+			
+			Document doc = null;
+			try{
+				doc=Jsoup.parse(input, "UTF-8");
+			}catch(FileNotFoundException ioe){
+				input = new File(Constants.PROJECT_PATH+File.separator+"res"+File.separator+sr.getNumber()+".html");
+				doc=Jsoup.parse(input, "UTF-8");
+			}
 			Element e = doc.getElementById(Constants.ID_CASE_ENTRIES);
 			Node n = e.parentNode();
 
@@ -158,10 +180,22 @@ public class SRDetailsDownloader {
 				String inputLine;
 				
 				// save to this filename
-				File file = new File(Constants.RES+File.separator+sr.getNumber()+".html");
+				File file = null;
 				
-				if (!file.exists()) {
-					file.createNewFile();
+				try{
+					file = new File(Constants.RES+File.separator+sr.getNumber()+".html");
+					
+					if (!file.exists()) {
+						file.createNewFile();
+					}
+					
+				}catch(IOException ioe){
+					file = new File(Constants.PROJECT_PATH+"res"+File.separator+sr.getNumber()+".html");	
+
+					if (!file.exists()) {
+						file.createNewFile();
+					}
+
 				}
 				
 				// use FileWriter to write file
@@ -169,7 +203,7 @@ public class SRDetailsDownloader {
 				BufferedWriter bw = new BufferedWriter(fw);
 				
 				while ((inputLine = br.readLine()) != null) {
-					System.out.println(inputLine);
+//					System.out.println(inputLine);
 					bw.write(inputLine + "\n");
 				}
 				

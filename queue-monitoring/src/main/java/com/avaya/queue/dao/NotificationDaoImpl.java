@@ -20,17 +20,19 @@ public class NotificationDaoImpl implements NotificationDao {
 	}
 
 	public void insert(String srNumber) {
-		String sql=" INSERT INTO Notification(srNumber,notificationDate) VALUES (:srNumber,:notificationDate) ";
+		String sql=" INSERT INTO Notification(srNumber,notificationDate,reminder) VALUES (:srNumber,:notificationDate,:reminder) ";
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("srNumber", srNumber);
+		params.put("reminder", 0);
 		params.put("notificationDate", new Date());
 		namedParameterJdbcTemplate.update(sql, params);
 	}
 
-	public void update(String srNumber) {
-		String sql="UPDATE Notification set notificationDate=:notificationDate where srNumber=:srNumber";
+	public void update(String srNumber, int reminder) {
+		String sql="UPDATE Notification set notificationDate=:notificationDate,reminder=:reminder where srNumber=:srNumber";
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("srNumber", srNumber);
+		params.put("reminder", reminder);
 		params.put("notificationDate", new Date());
 		namedParameterJdbcTemplate.update(sql, params);
 	}
@@ -39,7 +41,7 @@ public class NotificationDaoImpl implements NotificationDao {
 		Map<String, Object> params = new HashMap<String, Object>();
 		Notification notification=null;
 		params.put("srNumber", srNumber);
-		String sql=" SELECT srNumber,notificationDate from Notification WHERE srNumber=:srNumber";
+		String sql=" SELECT srNumber,notificationDate,reminder from Notification WHERE srNumber=:srNumber";
 		try{
 			notification = namedParameterJdbcTemplate.queryForObject(sql, params, new NotificationMapper());
 		}catch(EmptyResultDataAccessException e){

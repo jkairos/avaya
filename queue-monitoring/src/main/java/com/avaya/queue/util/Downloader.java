@@ -1,4 +1,4 @@
-package com.avaya.queue;
+package com.avaya.queue.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,6 @@ import java.net.URL;
 import org.apache.commons.io.FileUtils;
 
 import com.avaya.queue.security.PKIXAuthenticator;
-import com.avaya.queue.util.Constants;
 
 public class Downloader {
 
