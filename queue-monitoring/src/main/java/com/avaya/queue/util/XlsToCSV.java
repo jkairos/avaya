@@ -80,10 +80,10 @@ public class XlsToCSV {
 				data.append("\n");
 			}
 
-			File outputFile = new File(Constants.CONTRACTS_CSV);
-			FileOutputStream fos = new FileOutputStream(outputFile);
-			fos.write(data.toString().getBytes());
-			fos.close();
+//			File outputFile = new File(Constants.CONTRACTS_CSV);
+//			FileOutputStream fos = new FileOutputStream(outputFile);
+//			fos.write(data.toString().getBytes());
+//			fos.close();
 
 			if(logger.isDebugEnabled()){
 				logger.debug("Contract File Converted to CSV Format");

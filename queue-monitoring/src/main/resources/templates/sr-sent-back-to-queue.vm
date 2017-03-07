@@ -19,10 +19,9 @@
 		         </td>
 	        </tr>
 		#end
-		<tr>
+			<tr>
 	         <td class="fullNoBorderContainer" colspan="2">
-	         	<b><font color="red">NO CONTRACTS FOUND FOR CUSTOMER $!sr.account</font>.
-	         	RESPONSIBLE FOR THE QUEUE MONITORING SLOT PLEASE DETERMINE CUSTOMER'S ENTITLEMENT.</b>
+	         	<b><font color="#0000ff">SR Sent Back To Our Queue By <u>$!sr.sentBackToQueueHandle</u>. ANY TAKERS?</b>
 	         </td>
 	        </tr>
 	        <tr>
@@ -107,7 +106,6 @@
 			</tbody>
 		</table>
 		<br>
-		<br>	
    		<table class="employeeMessageContainer">
    			<tr>
    				<td>
@@ -138,7 +136,7 @@
 			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end"><b>$!activity.owner</b></td>
 			    </tr>
 			    <tr>
-			      <td colspan="7" class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end">$!activity.description</td>
+			      <td colspan="7" class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!activity.description</td>
 			    </tr>
 			#end
 		</table>

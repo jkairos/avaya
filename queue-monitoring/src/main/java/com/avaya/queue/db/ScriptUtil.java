@@ -37,19 +37,46 @@ import com.avaya.queue.util.Constants;
  */
 public class ScriptUtil {
 	private final static Logger logger = Logger.getLogger(ScriptUtil.class);
-
+	private static final Map<String, String> MAP_MONTHS; 
+	
+	static{
+		MAP_MONTHS = new HashMap<String, String>();
+		MAP_MONTHS.put("JANUARY", "01");
+		MAP_MONTHS.put("JAN", "01");
+		MAP_MONTHS.put("FEB", "02");
+		MAP_MONTHS.put("FEBRUARY", "02");
+		MAP_MONTHS.put("MAR", "03");
+		MAP_MONTHS.put("MARCH", "03");
+		MAP_MONTHS.put("APR", "04");
+		MAP_MONTHS.put("APRIL", "04");
+		MAP_MONTHS.put("MAY", "05");
+		MAP_MONTHS.put("JUN", "06");
+		MAP_MONTHS.put("JUNE", "06");
+		MAP_MONTHS.put("JUL", "07");
+		MAP_MONTHS.put("JULY", "07");
+		MAP_MONTHS.put("AUG", "08");
+		MAP_MONTHS.put("AUGUST", "08");
+		MAP_MONTHS.put("SEPT", "09");
+		MAP_MONTHS.put("SEPTEMBER", "09");
+		MAP_MONTHS.put("OCT", "10");
+		MAP_MONTHS.put("OCTOBER", "10");
+		MAP_MONTHS.put("NOV", "11");
+		MAP_MONTHS.put("NOVEMBER", "11");
+		MAP_MONTHS.put("DEC", "12");
+		MAP_MONTHS.put("DECEMBER", "12");
+	}
 	public void createInsertContractsScript() {
 		try {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Reading Contract File To CREATE insert-data.sql file");
 			}
 
-			 Map<String,Object> map = this.getContractsSheetDMLScript();
-			 StringBuilder data = (StringBuilder) map.get("data");
-			 // StringBuilder data = new StringBuilder();
-			 this.getManualContractsSheetDMLScript(data,(Integer)map.get("counter"));
-//			StringBuilder data = new StringBuilder();
-//			this.getManualContractsSheetDMLScript(data, 1);
+			Map<String, Object> map = this.getContractsSheetDMLScript();
+			StringBuilder data = (StringBuilder) map.get("data");
+			// StringBuilder data = new StringBuilder();
+			this.getManualContractsSheetDMLScript(data, (Integer) map.get("counter"));
+			// StringBuilder data = new StringBuilder();
+			// this.getManualContractsSheetDMLScript(data, 1);
 			File outputFile = null;
 			FileOutputStream fos = null;
 
@@ -319,6 +346,7 @@ public class ScriptUtil {
 		String fromDate = null;
 		String toDate = null;
 		String status = null;
+		String commentsAppsSuppTeam = null;
 
 		while (rowIterator.hasNext()) {
 			customerName = null;
@@ -328,13 +356,14 @@ public class ScriptUtil {
 			fromDate = null;
 			toDate = null;
 			status = null;
-
+			commentsAppsSuppTeam = null;
+			
 			Row row = rowIterator.next();
 			// For each row, iterate through all the columns
 			Iterator<Cell> cellIterator = row.cellIterator();
 			while (cellIterator.hasNext()) {
 				Cell cell = cellIterator.next();
-				
+
 				if (row.getRowNum() > 1) {// Skip header
 					// Set the data to String
 					if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
@@ -342,7 +371,7 @@ public class ScriptUtil {
 							cell.setCellType(CellType.STRING);
 						}
 					}
-					
+
 					if (cell.getColumnIndex() == 0) {// Customer name
 						customerName = cell.getStringCellValue();
 						customerName = customerName.trim();
@@ -367,7 +396,7 @@ public class ScriptUtil {
 								fromDate = fromDate.replaceAll(",", "");
 								fromDate = fromDate.replaceAll("'", " ");
 							}
-						}else {
+						} else {
 							fromDate = cell.getStringCellValue();
 							fromDate = fromDate.trim();
 							fromDate = fromDate.replaceAll(",", "");
@@ -384,20 +413,77 @@ public class ScriptUtil {
 								toDate = toDate.replaceAll(",", "");
 								toDate = toDate.replaceAll("'", " ");
 							}
-						}else {
+						} else {
 							toDate = cell.getStringCellValue();
 							toDate = toDate.trim();
 							toDate = toDate.replaceAll(",", "");
 							toDate = toDate.replaceAll("'", " ");
+							toDate = toDate.replaceAll("\\.", " ");
+							char charArray[] = toDate.toCharArray();
+							String day = "";
+							String month="";
+							String year = "";
+							int i = 0;
+							
+							while(!Character.isDigit(charArray[i])){
+								i++;
+							}
+							
+							int index=0;
+							
+							while(charArray[index] != ' '){
+								month+=charArray[index];
+								index++;
+							}
+							
+							month=month.trim();
+							if(MAP_MONTHS.get(month.toUpperCase()) == null){
+								System.out.println("");
+							}
+							month=MAP_MONTHS.get(month.toUpperCase());
+							
+							while(Character.isDigit(charArray[i])){
+								day+=charArray[i];
+								i++;
+							}
+							
+							if(day.length()<2){
+								day="0"+day;
+							}
+							
+							while(!Character.isDigit(charArray[i])){
+								i++;
+							}
+							
+							while(i < charArray.length && Character.isDigit(charArray[i])){
+								year+=charArray[i];
+								i++;
+							}
+							year=year.trim();
+							toDate=day+"/"+month+"/"+year;
 						}
-						
-					} else if (cell.getColumnIndex() == 9) {// Status
-						status = cell.getStringCellValue();
-						status = status.trim();
-						status = status.replaceAll(",", "");
-						status = status.replaceAll("'", " ");
+
+					}else if(cell.getColumnIndex() == 9){//Comments APP 
+						commentsAppsSuppTeam= cell.getStringCellValue();
+						commentsAppsSuppTeam = commentsAppsSuppTeam.trim();
+						commentsAppsSuppTeam = commentsAppsSuppTeam.replaceAll(",", "");
+						commentsAppsSuppTeam = commentsAppsSuppTeam.replaceAll("'", " ");
 					}
-					
+
+				}
+
+			}
+
+			if (toDate != null && !toDate.isEmpty()) {
+				DateTime endContract = null;
+				endContract = fmt.parseDateTime(toDate);
+				endContract = new DateTime(endContract.year().get(), endContract.monthOfYear().get(),
+						endContract.dayOfMonth().get(), 23, 59, 59);
+				// Contract Still Valid
+				if (endContract.isAfterNow() || endContract.isEqualNow()) {
+					status="Open";
+				}else{
+					status="Closed";
 				}
 				
 			}
@@ -405,24 +491,26 @@ public class ScriptUtil {
 			// create Insert scpript
 			if (fls != null && fls.length > 0) {
 				for (int i = 0; i < fls.length; i++) {
-					if ((customerName != null && !customerName.equals("")) 
-							|| (fls[i]!=null && !fls[i].equals(""))
+					if ((customerName != null && !customerName.equals("")) || (fls[i] != null && !fls[i].equals(""))
 							|| (solutionSold != null && !solutionSold.equals(""))
-							|| (fromDate != null && !fromDate.equals("")) 
-							|| (toDate != null && !toDate.equals(""))
-							|| (status != null && !status.equals(""))) {
+							|| (fromDate != null && !fromDate.equals("")) || (toDate != null && !toDate.equals(""))) {
+
+
 						data.append(
-								"INSERT INTO CONTRACTS(id,customerNameEndUser,fl,solutionApplication,manualDate,status) \n "
+								"INSERT INTO CONTRACTS(id,customerNameEndUser,fl,solutionApplication,manualDate,status,commentsAppsSuppTeam) \n "
 										+ "VALUES(" + counter + ",");
-						data.append((customerName != null && !customerName.equals("") ? "'" + customerName + "'" : "NULL")
-								+ ",");
+						data.append(
+								(customerName != null && !customerName.equals("") ? "'" + customerName + "'" : "NULL")
+										+ ",");
 						fl = fls[i];
 						fl = fl.trim();
 						data.append((fl != null && !fl.equals("") ? "'" + fl + "'" : "NULL") + ",");
-						data.append((solutionSold != null && !solutionSold.equals("") ? "'" + solutionSold + "'" : "NULL")
-								+ ",");
+						data.append(
+								(solutionSold != null && !solutionSold.equals("") ? "'" + solutionSold + "'" : "NULL")
+										+ ",");
 						data.append("'" + fromDate + " - " + toDate + "',");
-						data.append((status != null && !status.equals("") ? "'" + status + "'" : "NULL"));
+						data.append((status != null && !status.equals("") ? "'" + status + "'," : "NULL,"));
+						data.append((commentsAppsSuppTeam != null && !commentsAppsSuppTeam.equals("") ? "'" + commentsAppsSuppTeam + "'" : "NULL"));
 						data.append(");\n");
 						counter++;
 					}
@@ -430,11 +518,10 @@ public class ScriptUtil {
 			} else {
 				if ((customerName != null && !customerName.equals(""))
 						|| (solutionSold != null && !solutionSold.equals(""))
-						|| (fromDate != null && !fromDate.equals("")) 
-						|| (toDate != null && !toDate.equals(""))
+						|| (fromDate != null && !fromDate.equals("")) || (toDate != null && !toDate.equals(""))
 						|| (status != null && !status.equals(""))) {
 					data.append(
-							"INSERT INTO CONTRACTS(id,customerNameEndUser,fl,solutionApplication,manualDate,status) \n "
+							"INSERT INTO CONTRACTS(id,customerNameEndUser,fl,solutionApplication,manualDate,status,commentsAppsSuppTeam) \n "
 									+ "VALUES(" + counter + ",");
 					data.append((customerName != null && !customerName.equals("") ? "'" + customerName + "'" : "NULL")
 							+ ",");
@@ -442,7 +529,8 @@ public class ScriptUtil {
 					data.append((solutionSold != null && !solutionSold.equals("") ? "'" + solutionSold + "'" : "NULL")
 							+ ",");
 					data.append("'" + fromDate + " - " + toDate + "',");
-					data.append((status != null && !status.equals("") ? "'" + status + "'" : "NULL"));
+					data.append((status != null && !status.equals("") ? "'" + status + "'," : "NULL,"));
+					data.append((commentsAppsSuppTeam != null && !commentsAppsSuppTeam.equals("") ? "'" + commentsAppsSuppTeam + "'" : "NULL"));
 					data.append(");\n");
 
 				}

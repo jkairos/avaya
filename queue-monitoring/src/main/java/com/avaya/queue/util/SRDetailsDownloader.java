@@ -21,25 +21,26 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
+import com.avaya.queue.email.Settings;
 import com.avaya.queue.entity.Activity;
 import com.avaya.queue.entity.SR;
 import com.avaya.queue.security.PKIXAuthenticator;
 
 public class SRDetailsDownloader {
 	private final static Logger logger = Logger.getLogger(SRDetailsDownloader.class);
-	
+
 	public List<SR> getSRDetails(List<SR> queueList) {
 		File input = null;
 		Document doc = null;
 		try {
 			this.downloadSrDetails(queueList);
-			
+
 			for (SR sr : queueList) {
-				try{
-					input = new File(Constants.RES+sr.getNumber()+".html");	
+				try {
+					input = new File(Constants.RES + sr.getNumber() + ".html");
 					doc = Jsoup.parse(input, "UTF-8");
-				}catch(FileNotFoundException e){
-					input = new File(Constants.PROJECT_PATH+"res"+File.separator+sr.getNumber()+".html");	
+				} catch (FileNotFoundException e) {
+					input = new File(Constants.PROJECT_PATH + "res" + File.separator + sr.getNumber() + ".html");
 					doc = Jsoup.parse(input, "UTF-8");
 				}
 				Element productEntitlement = doc.getElementById(Constants.ID_PRODUCT_ENTITLEMENT);
@@ -58,37 +59,77 @@ public class SRDetailsDownloader {
 				sr.setDescription(srDescription.text());
 				sr.setSeverity(severity.text());
 				sr.setParentName(parentName.text());
-				String str=securityRestricted.text();
-				sr.setSecurityRestricted(str.equals("Y")?Boolean.TRUE:Boolean.FALSE);
+				String str = securityRestricted.text();
+				sr.setSecurityRestricted(str.equals("Y") ? Boolean.TRUE : Boolean.FALSE);
 				sr.setCaseEntries(this.getCaseEntries(sr));
 				sr.setNameContact(contactName.text());
 				sr.setPhoneContact(contactPhone.text());
 				sr.setEmailContact(contactEmail.text());
 				sr.setPrefLanguage(prefLanguage.text());
+				// Checks whether the SR has been sent back to queue or not by
+				// the contract team
+				sr.setSentBackToQueueByAccountTeam(this.isSrSentBackToQueueByAccountTeam(doc, sr));
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e);
 		}
-		
+
 		return queueList;
 	}
 
+	private boolean isSrSentBackToQueueByAccountTeam(Document doc, SR sr) {
+		boolean isSentBack = false;
+		// Strip the table from the page
+		Element table = doc.getElementById(Constants.ID_CONREF_ENTRIES);// Open
+		// SRs
+		// Table
+		// Strip the rows from the table
+		Elements tbRows = table.select("tr");
+		String previousOwner = null;
+		String currentOwner = null;
+		String allowedHandlers = Settings.getString(Constants.CONTRACT_TEAM_HANDLERS);
+		allowedHandlers=allowedHandlers.toLowerCase();
+		String queueHandle = Settings.getString(Constants.QUEUE_OWNER);
+		queueHandle=queueHandle.toLowerCase();
+
+		int i = 2;// Skips Table's header
+		while (i < tbRows.size()) {
+			Element row = tbRows.get(i);
+			Elements tds = row.select("td");
+			previousOwner = tds.get(2).text();
+			previousOwner=previousOwner.toLowerCase();
+			currentOwner = tds.get(4).text();
+			currentOwner=currentOwner.toLowerCase();
+			break;
+		}
+
+		if (previousOwner != null && allowedHandlers.contains(previousOwner)) {
+			if (currentOwner != null && currentOwner.equalsIgnoreCase(queueHandle)) {
+				isSentBack = true;
+				sr.setSentBackToQueueHandle(previousOwner.toUpperCase());
+			}
+		}
+
+		return isSentBack;
+	}
+
 	public List<Activity> getCaseEntries(SR sr) {
-		File input = new File(Constants.RES+File.separator+sr.getNumber()+".html");
+		File input = new File(Constants.RES + File.separator + sr.getNumber() + ".html");
 		boolean isGetContent = false;
-		int trCountForDescription=0;
+		int trCountForDescription = 0;
 		List<Activity> caseEntriesList = new ArrayList<Activity>();
 		Activity activity = null;
 		try {
-			
+
 			Document doc = null;
-			try{
-				doc=Jsoup.parse(input, "UTF-8");
-			}catch(FileNotFoundException ioe){
-				input = new File(Constants.PROJECT_PATH+File.separator+"res"+File.separator+sr.getNumber()+".html");
-				doc=Jsoup.parse(input, "UTF-8");
+			try {
+				doc = Jsoup.parse(input, "UTF-8");
+			} catch (FileNotFoundException ioe) {
+				input = new File(
+						Constants.PROJECT_PATH + File.separator + "res" + File.separator + sr.getNumber() + ".html");
+				doc = Jsoup.parse(input, "UTF-8");
 			}
 			Element e = doc.getElementById(Constants.ID_CASE_ENTRIES);
 			Node n = e.parentNode();
@@ -105,24 +146,25 @@ public class SRDetailsDownloader {
 						if (logger.isDebugEnabled()) {
 							logger.debug(elementNode.toString());
 						}
-						
-						outer:{
+
+						outer: {
 							for (Element row : elementNode.select("tr")) {
 								if (logger.isDebugEnabled()) {
 									logger.debug(row.toString());
 								}
 								Elements tds = row.select("td");
-								
+
 								for (int i = 0; i < tds.size(); i++) {
 									if (isGetContent) {
-										if(trCountForDescription%2==0){
+										if (trCountForDescription % 2 == 0) {
 											String desc = tds.get(0).html();
-											desc=desc.substring(desc.indexOf("<pre>"),desc.indexOf("</span>"));
+											desc = desc.substring(desc.indexOf("<pre>"), desc.indexOf("</span>"));
 											activity.setDescription(desc);
 											caseEntriesList.add(activity);
-											trCountForDescription=1;
-										}else{
-											if(!tds.toString().contains("</table>") && !tds.toString().contains("Generated By")){
+											trCountForDescription = 1;
+										} else {
+											if (!tds.toString().contains("</table>")
+													&& !tds.toString().contains("Generated By")) {
 												activity = new Activity();
 												activity.setType(tds.get(1).text());
 												activity.setCreatedBy(tds.get(2).text());
@@ -132,7 +174,7 @@ public class SRDetailsDownloader {
 												activity.setAssignmentTime(tds.get(6).text());
 												activity.setOwner(tds.get(7).text());
 												trCountForDescription++;
-											}else{
+											} else {
 												break outer;
 											}
 											break;
@@ -143,10 +185,10 @@ public class SRDetailsDownloader {
 											trCountForDescription++;
 										}
 									}
-									
+
 								}
 							}
-							
+
 						}
 
 					}
@@ -164,52 +206,52 @@ public class SRDetailsDownloader {
 
 		return caseEntriesList;
 	}
-	
+
 	private void downloadSrDetails(List<SR> srs) {
 		URL url;
 
 		try {
 			for (SR sr : srs) {
-				url = new URL(Constants.SR_DETAILS_URL+sr.getNumber());
+				url = new URL(Constants.SR_DETAILS_URL + sr.getNumber());
 				PKIXAuthenticator.authenticate();
 				HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-				
+
 				// open the stream and put it into BufferedReader
 				BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-				
+
 				String inputLine;
-				
+
 				// save to this filename
 				File file = null;
-				
-				try{
-					file = new File(Constants.RES+File.separator+sr.getNumber()+".html");
-					
+
+				try {
+					file = new File(Constants.RES + File.separator + sr.getNumber() + ".html");
+
 					if (!file.exists()) {
 						file.createNewFile();
 					}
-					
-				}catch(IOException ioe){
-					file = new File(Constants.PROJECT_PATH+"res"+File.separator+sr.getNumber()+".html");	
+
+				} catch (IOException ioe) {
+					file = new File(Constants.PROJECT_PATH + "res" + File.separator + sr.getNumber() + ".html");
 
 					if (!file.exists()) {
 						file.createNewFile();
 					}
 
 				}
-				
+
 				// use FileWriter to write file
 				FileWriter fw = new FileWriter(file.getAbsoluteFile());
 				BufferedWriter bw = new BufferedWriter(fw);
-				
+
 				while ((inputLine = br.readLine()) != null) {
-//					System.out.println(inputLine);
+					// System.out.println(inputLine);
 					bw.write(inputLine + "\n");
 				}
-				
+
 				bw.close();
 				br.close();
-				
+
 			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

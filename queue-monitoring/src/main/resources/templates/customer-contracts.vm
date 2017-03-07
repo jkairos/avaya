@@ -10,7 +10,7 @@
 	    #if( $reminder > 0 )
 			<tr>
 		         <td class="fullNoBorderContainer" colspan="2">
-		         	<b><i><u><font color="red">$reminder# REMINDER: THE SR HAS NOT BEEN OWNED BY ANYONE YET.</font></u></i></b>
+		         	<b><i><u><font color="red">$reminder# REMINDER: The SR has not been owned by anyone yet.#if($sr.sev=="SBI") This is a SEVERE BUSINESS IMPACT (SBI) #elseif($sr.sev=="OUTG") This is an OUTAGE#end</font></u></i></b>
 		         </td>
 	        </tr>
 			<tr>
@@ -21,8 +21,9 @@
 		#end
 			<tr>
 	         <td class="fullNoBorderContainer" colspan="2">
-	         	<b><font color="#0000ff">CONTRACTS FOUND FOR CUSTOMER $!sr.account</font>.
-	         	RESPONSIBLE FOR THE QUEUE MONITORING SLOT PLEASE DETERMINE CUSTOMER'S ENTITLEMENT</b>
+	         	<b><font color="#0000ff">Contract(s) Found $!contractFound For Customer <u>$!sr.account</u></font>.
+	         	Responsible For The Queue Monitoring Slot <u>PLEASE DETERMINE CUSTOMER'S ENTITLEMENT</u>. The Tool <u>ONLY RETURNS 
+	         	THE CONTRACT(S) FOUND AND IT IS NOT PERFORMING A MATCH WITH THE PRODUCT</u>.</b>
 	         </td>
 	        </tr>
 	        <tr>
@@ -123,6 +124,7 @@
 			    <th>Status</th>
 			    <th>FL</th>
 			    <th>Sold To Name</th>
+			    <th>Ship To</th>
 			    <th>Customer Name/End User</th>
 			    <th>Start Last Renewed/END</th>
 			    <th>Solution Application</th>
@@ -134,6 +136,7 @@
 				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.status</td>
 				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.fl</td>
 				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.soldToName</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.shipTo</td>
 				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.customerNameEndUser</td>
 				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.startLastRenewed  $!customerContract.endContract</td>
 				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.solutionApplication</td>

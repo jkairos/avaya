@@ -30,6 +30,8 @@ public class SR {
 	private String phoneContact;
 	private String emailContact;
 	private String prefLanguage;
+	private boolean sentBackToQueueByAccountTeam;
+	private String sentBackToQueueHandle;
 	
 	public String getSeverity() {
 		return severity;
@@ -179,8 +181,6 @@ public class SR {
 		this.parentName = parentName;
 	}
 	
-	
-	
 	public String getNameContact() {
 		return nameContact;
 	}
@@ -204,6 +204,20 @@ public class SR {
 	}
 	public void setPrefLanguage(String prefLanguage) {
 		this.prefLanguage = prefLanguage;
+	}
+	
+	public boolean isSentBackToQueueByAccountTeam() {
+		return sentBackToQueueByAccountTeam;
+	}
+	public void setSentBackToQueueByAccountTeam(boolean sentBackToQueueByAccountTeam) {
+		this.sentBackToQueueByAccountTeam = sentBackToQueueByAccountTeam;
+	}
+	
+	public String getSentBackToQueueHandle() {
+		return sentBackToQueueHandle;
+	}
+	public void setSentBackToQueueHandle(String sentBackToQueueHandle) {
+		this.sentBackToQueueHandle = sentBackToQueueHandle;
 	}
 	@Override
 	public String toString() { 

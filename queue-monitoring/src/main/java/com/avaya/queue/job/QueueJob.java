@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Minutes;
@@ -36,7 +35,7 @@ public class QueueJob extends ApplicationJob {
 	public void setCustomerContractDao(CustomerContractDao customerContractDao) {
 		this.customerContractDao = customerContractDao;
 	}
-	
+
 	public void processQueue() {
 		logger.info("Begin Process Queue");
 		getUrlContent.readUrl();
@@ -59,10 +58,12 @@ public class QueueJob extends ApplicationJob {
 		customerContractDao = (CustomerContractDao) QueueMonitoringApp.context.getBean("customerContractDao");
 		List<CustomerContract> customerContracts = customerContractDao.findByFl(sr.getFl());
 		DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
-		
+
+		context.put("contractFound", "BY FL (" + sr.getFl() + ")");
 		if (customerContracts == null || customerContracts.isEmpty()) {
 			// Could not find by FL, tries FL in shipTo column
 			customerContracts = customerContractDao.findByShipTo(sr.getFl());
+			context.put("contractFound", "BY SHIP TO (" + sr.getFl() + ")");
 		}
 
 		if (customerContracts == null || customerContracts.isEmpty()) {
@@ -70,31 +71,36 @@ public class QueueJob extends ApplicationJob {
 			// solution @TODO
 			// needs to be implemented
 			customerContracts = customerContractDao.findByName(sr);
+			context.put("contractFound",
+					"BY NAME (soldToName, name, customerNameEndUser, parentName, commentsAppsSuppTeam)");
 		}
-		
+
 		List<CustomerContract> customerContractsToProcess = new ArrayList<CustomerContract>();
-		
-		if(customerContracts!=null && !customerContracts.isEmpty()){
+
+		if (customerContracts != null && !customerContracts.isEmpty()) {
 			DateTime endContract = null;
-			String manualDate=null;
-			
-			for(CustomerContract cc : customerContracts){
-				if(cc.getEndContract()!=null && !cc.getEndContract().isEmpty()){
+			String manualDate = null;
+
+			for (CustomerContract cc : customerContracts) {
+				if (cc.getEndContract() != null && !cc.getEndContract().isEmpty()) {
 					endContract = fmt.parseDateTime(cc.getEndContract());
-				}else{
-					manualDate=cc.getManualDate();
-					manualDate=manualDate.substring(manualDate.indexOf("-"+1), manualDate.length());
-					manualDate=manualDate.trim();
-					endContract=fmt.parseDateTime(manualDate);
+				} else {
+					manualDate = cc.getManualDate();
+					manualDate = manualDate.substring(manualDate.indexOf("-" + 1), manualDate.length());
+					manualDate = manualDate.trim();
+					endContract = fmt.parseDateTime(manualDate);
 				}
-				endContract = new DateTime(endContract.year().get(), endContract.monthOfYear().get(), endContract.dayOfMonth().get(), 23, 59, 59);
-				if(endContract.isAfterNow() || endContract.isEqualNow()){//Contract still valid
+				endContract = new DateTime(endContract.year().get(), endContract.monthOfYear().get(),
+						endContract.dayOfMonth().get(), 23, 59, 59);
+				if (endContract.isAfterNow() || endContract.isEqualNow()) {// Contract
+																			// still
+																			// valid
 					customerContractsToProcess.add(cc);
 				}
-				
+
 			}
 		}
-		
+
 		sr.setCustomerContracts(customerContractsToProcess);
 	}
 
@@ -107,15 +113,16 @@ public class QueueJob extends ApplicationJob {
 			notification = noticiationDao.findBySr(srNumber);
 			DateTime now = new DateTime();
 
-			if (notification == null) {// 1st time the notification is being sent
+			if (notification == null) {// 1st time the notification is being
+										// sent
 				this.setSRCustomerContractsDb(sr);
-				if(now.getDayOfWeek()<DateTimeConstants.SATURDAY){//Weekdays
-					this.sendEmail(sr,0);
+				if (now.getDayOfWeek() < DateTimeConstants.SATURDAY) {// Weekdays
+					this.sendEmail(sr, 0);
 					noticiationDao.insert(srNumber);
-				}else{//Weekend
-					//On the Weekend sends email only for SBI or OUTG
-					if(sr.getSev().equalsIgnoreCase(Constants.SBI) || sr.getSev().equalsIgnoreCase(Constants.OUTG)){
-						this.sendEmail(sr,0);
+				} else {// Weekend
+						// On the Weekend sends email only for SBI or OUTG
+					if (sr.getSev().equalsIgnoreCase(Constants.SBI) || sr.getSev().equalsIgnoreCase(Constants.OUTG)) {
+						this.sendEmail(sr, 0);
 						noticiationDao.insert(srNumber);
 					}
 				}
@@ -136,7 +143,7 @@ public class QueueJob extends ApplicationJob {
 						configIntervalToResendEmail = Integer.valueOf(Settings.getString(Constants.BI_INTERVAL));
 					} else if (sr.getSev().equalsIgnoreCase(Constants.NSI)) {
 						configIntervalToResendEmail = Integer.valueOf(Settings.getString(Constants.NSI_INTERVAL));
-					}else if (sr.getSev().equalsIgnoreCase(Constants.OUTG)) {
+					} else if (sr.getSev().equalsIgnoreCase(Constants.OUTG)) {
 						configIntervalToResendEmail = Integer.valueOf(Settings.getString(Constants.OUTG_INTERVAL));
 					}
 
@@ -145,16 +152,17 @@ public class QueueJob extends ApplicationJob {
 				}
 
 				if (minutes > configIntervalToResendEmail) {
-					int reminder=notification.getReminder()+1;
+					int reminder = notification.getReminder() + 1;
 					this.setSRCustomerContractsDb(sr);
-					if(now.getDayOfWeek()<DateTimeConstants.SATURDAY){//Weekdays
-						this.sendEmail(sr,reminder);
-						noticiationDao.update(srNumber,reminder);
-					}else{//Weekend
-						//On the Weekend sends email only for SBI or OUTG
-						if(sr.getSev().equalsIgnoreCase(Constants.SBI) || sr.getSev().equalsIgnoreCase(Constants.OUTG)){
-							this.sendEmail(sr,reminder);
-							noticiationDao.update(srNumber,reminder);
+					if (now.getDayOfWeek() < DateTimeConstants.SATURDAY) {// Weekdays
+						this.sendEmail(sr, reminder);
+						noticiationDao.update(srNumber, reminder);
+					} else {// Weekend
+							// On the Weekend sends email only for SBI or OUTG
+						if (sr.getSev().equalsIgnoreCase(Constants.SBI)
+								|| sr.getSev().equalsIgnoreCase(Constants.OUTG)) {
+							this.sendEmail(sr, reminder);
+							noticiationDao.update(srNumber, reminder);
 						}
 					}
 				}
@@ -169,6 +177,8 @@ public class QueueJob extends ApplicationJob {
 		if (sr != null && !sr.getCustomerContracts().isEmpty()) {
 			template = velocityEngine.getTemplate("customer-contracts.vm");
 			contractFound = true;
+		} else if (sr != null && sr.isSentBackToQueueByAccountTeam()) {
+			template = velocityEngine.getTemplate("sr-sent-back-to-queue.vm");
 		} else if (sr != null && sr.getCustomerContracts().isEmpty()) {
 			template = velocityEngine.getTemplate("no-contracts-found.vm");
 			contractFound = false;
@@ -192,9 +202,16 @@ public class QueueJob extends ApplicationJob {
 		String message = swOut.toString();
 		String subject = null;
 		if (sr != null) {
-			subject = "QPC " + (sr.getType().equalsIgnoreCase("Collaboration") ? " - COLLABORATION - " : " - ")
-					+ (contractFound ? "Contract Found / " : "No Valid Contract Found / ") + sr.getNumber() + " / "
-					+ sr.getAccount() + " / " + sr.getProductEntitled() + " / " + sr.getDescription();
+			if (sr.isSentBackToQueueByAccountTeam()) {
+				subject = "QPC " + (sr.getType().equalsIgnoreCase("Collaboration") ? " - COLLABORATION - " : " - ")
+						+ " Sent Back to Our Queue By " + sr.getSentBackToQueueHandle() + " / " + sr.getNumber() + " / "
+						+ sr.getAccount() + " / " + sr.getProductEntitled() + " / " + sr.getDescription();
+			} else {
+				subject = "QPC " + (sr.getType().equalsIgnoreCase("Collaboration") ? " - COLLABORATION - " : " - ")
+						+ (contractFound ? "Contract Found / " : "No Valid Contract Found / ") + sr.getNumber() + " / "
+						+ sr.getAccount() + " / " + sr.getProductEntitled() + " / " + sr.getDescription();
+			}
+
 		} else {
 			subject = "QPC  - Queue is Empty";
 		}

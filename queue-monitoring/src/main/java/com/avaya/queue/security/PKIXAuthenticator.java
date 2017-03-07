@@ -16,7 +16,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
 
-import com.avaya.queue.util.Constants;
 import com.avaya.queue.util.QueueMonitoringProperties;
 
 public class PKIXAuthenticator {
