@@ -8,7 +8,9 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
 import com.avaya.queue.email.AsyncEmailer;
+import com.avaya.queue.email.Settings;
 import com.avaya.queue.entity.SR;
+import com.avaya.queue.util.Constants;
 
 public class QueuePendingSrsJob extends ApplicationJob {
 	private final static Logger logger = Logger.getLogger(QueuePendingSrsJob.class);
@@ -56,9 +58,9 @@ public class QueuePendingSrsJob extends ApplicationJob {
 		String message = swOut.toString();
 		String subject = null;
 		if (queueList != null) {
-			subject = "QPC  - PENDING =  " +queueList.size();
+			subject = Settings.getString(Constants.APP_SHORT_NAME) + " - PENDING =  " +queueList.size();
 		} else {
-			subject = "QPC  - Queue is Empty";
+			subject = Settings.getString(Constants.APP_SHORT_NAME) + " - Queue is Empty";
 		}
 
 		AsyncEmailer.getInstance(subject, message).start();

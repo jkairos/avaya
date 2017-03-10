@@ -19,20 +19,10 @@
 	</bean>
 	
 	<!-- jdbc:hsqldb:mem:dataSource -->
-	<!-- <jdbc:embedded-database id="dataSource" type="HSQL">
-		<jdbc:script location="file:///${sys:HOME}/qpc/db/create-db.sql" />
-		<jdbc:script location="file:///${sys:HOME}/qpc/db/insert-data.sql" />
-	</jdbc:embedded-database> -->
-
-	<jdbc:embedded-database id="dataSource" type="HSQL"> 
-		<jdbc:script location="classpath:/db/create-db.sql" />
-		<jdbc:script location="classpath:/db/insert-data.sql" />
-	</jdbc:embedded-database> 
-
-	<!--  <jdbc:embedded-database id="dataSource" type="HSQL">
-		<jdbc:script location="file:///Users/jferreira/qpc/db/create-db.sql" />
-		<jdbc:script location="file:///Users/jferreira/qpc/db/insert-data.sql" />
-	</jdbc:embedded-database> -->
+	<jdbc:embedded-database id="dataSource" type="HSQL">
+		<jdbc:script location="file:///#{systemProperties['user.home']}/qpc/db/create-db.sql" />
+		<jdbc:script location="file:///#{systemProperties['user.home']}/qpc/db/insert-data.sql" />
+	</jdbc:embedded-database>
 
 	<bean id="jdbcTemplate"
 		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">

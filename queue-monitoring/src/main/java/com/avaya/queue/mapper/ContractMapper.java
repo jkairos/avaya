@@ -16,6 +16,7 @@ public class ContractMapper implements RowMapper<CustomerContract> {
 		CustomerContract customerContract = new CustomerContract();
 		DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
 		
+		customerContract.setId(result.getString("id"));
 		customerContract.setRegion(result.getString("region"));
 		customerContract.setCountry(result.getString("country"));
 		customerContract.setStatus(result.getString("status"));

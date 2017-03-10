@@ -16,7 +16,7 @@ import com.avaya.queue.mapper.ContractMapper;
 public class CustomerContractDaoImpl implements CustomerContractDao {
 	
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-	private static final String SELECT_CLAUSE="SELECT region,"
+	private static final String SELECT_CLAUSE="SELECT id, region,"
 				+ " country,"
 				+ " status,"
 				+ " eProject,"
@@ -86,8 +86,14 @@ public class CustomerContractDaoImpl implements CustomerContractDao {
 			sql+=" or (UPPER(soldToName) like UPPER(:parentName) or UPPER(customerNameEndUser) like UPPER(:parentName)) ";
 		}
 		
-		sql+=" or (UPPER(commentsAppsSuppTeam) like UPPER(:name))) and UPPER(status)=UPPER(:status) ";
+		sql+=" or (UPPER(commentsAppsSuppTeam) like UPPER(:name)) ";
 		
+		if(sr.getParentName()!=null && !sr.getParentName().equals("")){
+			sql+=" or (UPPER(commentsAppsSuppTeam) like UPPER(:parentName))";
+		}
+		
+		sql+=" and UPPER(status)=UPPER(:status))";
+				
 		List<CustomerContract> contracts = namedParameterJdbcTemplate.query(sql, params, new ContractMapper());
 		
 		return contracts;

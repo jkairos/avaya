@@ -2,7 +2,9 @@ package com.avaya.queue.job;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
@@ -26,7 +28,7 @@ import com.avaya.queue.util.Constants;
 public class QueueJob extends ApplicationJob {
 	private final static Logger logger = Logger.getLogger(QueueJob.class);
 	private CustomerContractDao customerContractDao;
-	
+
 	public CustomerContractDao getCustomerContractDao() {
 		return customerContractDao;
 	}
@@ -37,49 +39,110 @@ public class QueueJob extends ApplicationJob {
 	}
 
 	public void processQueue() {
-		logger.info("Begin Process Queue");
-		getUrlContent.readUrl();
+		try {
+			logger.info("Begin Process Queue");
+			getUrlContent.readUrl();
 
-		List<SR> queueList = getUrlContent.getQueueList();
-		if (logger.isDebugEnabled()) {
-			logger.debug("Current Queue Size: " + queueList.size());
-		}
-		if (queueList != null && !queueList.isEmpty()) {
+			List<SR> queueList = getUrlContent.getQueueList();
 			if (logger.isDebugEnabled()) {
-				logger.debug("QUEUE IS NOT EMPTY");
+				logger.debug("Current Queue Size: " + queueList.size());
 			}
-			srDetaildDownloader.getSRDetails(queueList);
-			this.sendEmail(queueList);
+
+			// List<SR> queueList = new ArrayList<SR>();
+			// SR sr = new SR();
+			// sr.setFl("51565952");
+			// sr.setNumber("1-12674024943");
+			// sr.setNameContact("WESTPAC BANKING CORP - WSDC PRE-PROD -");
+			// sr.setFlName("WESTPAC BANKING CORP - WSDC PRE-PROD -");
+			// sr.setParentName("WESTPAC");
+			// sr.setType("OUTG");
+			// sr.setSentBackToQueueHandle("DDVIEIRA");
+			// sr.setProductEntitled("TEst");
+			// sr.setProductSkill("test");
+			// sr.setDescription(" fasdaf sdasafdsafsadfsdaf");
+			// queueList.add(sr);
+			if (queueList != null && !queueList.isEmpty()) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("QUEUE IS NOT EMPTY");
+				}
+				srDetaildDownloader.getSRDetails(queueList);
+				this.sendEmail(queueList);
+			}
+			logger.info("End Process Queue");
+		} catch (Exception e) {
+			logger.error(e.getStackTrace(), e);
+			System.exit(0);
 		}
-		logger.info("End Process Queue");
 	}
 
 	private void setSRCustomerContractsDb(SR sr) {
-		customerContractDao = (CustomerContractDao) QueueMonitoringApp.context.getBean("customerContractDao");
-		List<CustomerContract> customerContracts = customerContractDao.findByFl(sr.getFl());
 		DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
+		String foundBy = null;
+		boolean foundByName = false;
+		DateTime endContract = null;
+		String manualDate = null;
+		customerContractDao = (CustomerContractDao) QueueMonitoringApp.context.getBean("customerContractDao");
+		Set<String> customerContractIdsMap = new HashSet<String>();
 
-		context.put("contractFound", "BY FL (" + sr.getFl() + ")");
-		if (customerContracts == null || customerContracts.isEmpty()) {
+		// Searches for FL
+		List<CustomerContract> customerContracts = customerContractDao.findByFl(sr.getFl());
+
+		if (customerContracts != null && !customerContracts.isEmpty()) {
+			foundBy = "BY FL (" + sr.getFl() + ")";
+		} else {
 			// Could not find by FL, tries FL in shipTo column
 			customerContracts = customerContractDao.findByShipTo(sr.getFl());
-			context.put("contractFound", "BY SHIP TO (" + sr.getFl() + ")");
+			if(customerContracts!=null && !customerContracts.isEmpty()){
+				foundBy = "BY SHIP TO (" + sr.getFl() + ")";
+			}
 		}
 
-		if (customerContracts == null || customerContracts.isEmpty()) {
-			// Could not find by FL, then tries by customer name, status and
-			// solution @TODO
-			// needs to be implemented
-			customerContracts = customerContractDao.findByName(sr);
-			context.put("contractFound",
-					"BY NAME (soldToName, name, customerNameEndUser, parentName, commentsAppsSuppTeam)");
+		if (customerContracts != null && !customerContracts.isEmpty()) {
+			for (CustomerContract customerContract : customerContracts) {
+				customerContractIdsMap.add(customerContract.getId());
+			}
+		}
+
+		// Always checks by name even it has been found by Ship To or FL
+		List<CustomerContract> customerContractsByName = customerContractDao.findByName(sr);
+		if (customerContractsByName != null && !customerContractsByName.isEmpty()) {
+			if (!customerContractIdsMap.isEmpty()) {
+				customerContracts = customerContracts == null ? new ArrayList<CustomerContract>() :customerContracts;
+				for (CustomerContract cc : customerContractsByName) {
+					if (!customerContractIdsMap.contains(cc.getId())) {
+						if (cc.getEndContract() != null && !cc.getEndContract().isEmpty()) {
+							endContract = fmt.parseDateTime(cc.getEndContract());
+						} else {
+							manualDate = cc.getManualDate();
+							manualDate = manualDate.substring(manualDate.indexOf("-" + 1), manualDate.length());
+							manualDate = manualDate.trim();
+							endContract = fmt.parseDateTime(manualDate);
+						}
+						endContract = new DateTime(endContract.year().get(), endContract.monthOfYear().get(),
+								endContract.dayOfMonth().get(), 23, 59, 59);
+						
+						// Contract still valid
+						if (endContract.isAfterNow() || endContract.isEqualNow()) {
+							customerContracts.add(cc);
+							foundByName = true;
+						}
+					}
+				}
+
+			}
+		}
+
+		if (foundByName) {
+			foundBy = foundBy != null ? foundBy + " AND BY <u>NAME</u> " : " BY NAME";
+		}
+
+		if (foundBy != null) {
+			context.put("contractFound", foundBy);
 		}
 
 		List<CustomerContract> customerContractsToProcess = new ArrayList<CustomerContract>();
 
 		if (customerContracts != null && !customerContracts.isEmpty()) {
-			DateTime endContract = null;
-			String manualDate = null;
 
 			for (CustomerContract cc : customerContracts) {
 				if (cc.getEndContract() != null && !cc.getEndContract().isEmpty()) {
@@ -92,9 +155,9 @@ public class QueueJob extends ApplicationJob {
 				}
 				endContract = new DateTime(endContract.year().get(), endContract.monthOfYear().get(),
 						endContract.dayOfMonth().get(), 23, 59, 59);
-				if (endContract.isAfterNow() || endContract.isEqualNow()) {// Contract
-																			// still
-																			// valid
+				
+				// Contract still valid
+				if (endContract.isAfterNow() || endContract.isEqualNow()) {
 					customerContractsToProcess.add(cc);
 				}
 
@@ -174,11 +237,14 @@ public class QueueJob extends ApplicationJob {
 		Template template = null;
 		boolean contractFound = false;
 
-		if (sr != null && !sr.getCustomerContracts().isEmpty()) {
+		if (sr != null && sr.isSentBackToQueueByAccountTeam()) {
+			template = velocityEngine.getTemplate("sr-sent-back-to-queue.vm");
+			if (sr.getCustomerContracts() != null && !sr.getCustomerContracts().isEmpty()) {
+				contractFound = true;
+			}
+		} else if (sr != null && !sr.getCustomerContracts().isEmpty()) {
 			template = velocityEngine.getTemplate("customer-contracts.vm");
 			contractFound = true;
-		} else if (sr != null && sr.isSentBackToQueueByAccountTeam()) {
-			template = velocityEngine.getTemplate("sr-sent-back-to-queue.vm");
 		} else if (sr != null && sr.getCustomerContracts().isEmpty()) {
 			template = velocityEngine.getTemplate("no-contracts-found.vm");
 			contractFound = false;
@@ -203,17 +269,17 @@ public class QueueJob extends ApplicationJob {
 		String subject = null;
 		if (sr != null) {
 			if (sr.isSentBackToQueueByAccountTeam()) {
-				subject = "QPC " + (sr.getType().equalsIgnoreCase("Collaboration") ? " - COLLABORATION - " : " - ")
+				subject = Settings.getString(Constants.APP_SHORT_NAME) + (sr.getType().equalsIgnoreCase("Collaboration") ? " - COLLABORATION - " : " - ")
 						+ " Sent Back to Our Queue By " + sr.getSentBackToQueueHandle() + " / " + sr.getNumber() + " / "
 						+ sr.getAccount() + " / " + sr.getProductEntitled() + " / " + sr.getDescription();
 			} else {
-				subject = "QPC " + (sr.getType().equalsIgnoreCase("Collaboration") ? " - COLLABORATION - " : " - ")
+				subject = Settings.getString(Constants.APP_SHORT_NAME) + (sr.getType().equalsIgnoreCase("Collaboration") ? " - COLLABORATION - " : " - ")
 						+ (contractFound ? "Contract Found / " : "No Valid Contract Found / ") + sr.getNumber() + " / "
 						+ sr.getAccount() + " / " + sr.getProductEntitled() + " / " + sr.getDescription();
 			}
 
 		} else {
-			subject = "QPC  - Queue is Empty";
+			subject = Settings.getString(Constants.APP_SHORT_NAME) + " - Queue is Empty";
 		}
 
 		AsyncEmailer.getInstance(subject, message).start();

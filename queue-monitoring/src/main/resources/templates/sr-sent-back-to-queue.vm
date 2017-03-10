@@ -82,6 +82,43 @@
 		    </tr>
 		</table>
 		<br>
+		<br>	
+   		<table class="employeeMessageContainer">
+   			<tr>
+   				<td>
+   					<span class="legalFooter"> 
+   						Following the list of contracts found for the customer <font color="#0000ff"> <b>$!sr.account: </b></font>
+   					</span>
+   				</td>
+   			</tr>
+   		</table>
+		<table class="tableBorder" width="100%" cellspacing="0">
+			<tr class="headRowV3">
+			    <th>Country/Region</th>
+			    <th>Status</th>
+			    <th>FL</th>
+			    <th>Sold To Name</th>
+			    <th>Ship To</th>
+			    <th>Customer Name/End User</th>
+			    <th>Start Last Renewed/END</th>
+			    <th>Solution Application</th>
+			    <th>Aps Supp Description</th>
+			</tr>
+			#foreach ($customerContract in $!customerContracts)
+				    <tr>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.country/$!customerContract.region</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.status</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.fl</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.soldToName</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.shipTo</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.customerNameEndUser</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.startLastRenewed  $!customerContract.endContract</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.solutionApplication</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!customerContract.apsSuppDescription</td>
+				    </tr>
+			#end
+		</table> 
+		<br>
 		<table class="tableBorder" width="100%" cellspacing="0">
 			<tbody>
 				<tr class="headRowV3">

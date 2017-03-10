@@ -24,15 +24,17 @@ public class QueueMonitoringApp {
 			if (context == null) {
 				if (context == null) {
 					try{
-						context = new FileSystemXmlApplicationContext("file:///"+Constants.APP_PATH+File.separator+"applicationContext.xml");
-					}catch(Exception e){
 						context = new ClassPathXmlApplicationContext("applicationContext.xml");
+					}catch(Exception e){
+						try{
+							String userHome = System.getProperty("user.home");
+							context = new FileSystemXmlApplicationContext("file:///"+userHome+File.separator+"qpc"+File.separator+"applicationContext.xml");
+						}catch(Exception e1){
+							context = new FileSystemXmlApplicationContext("file:///"+Constants.APP_PATH+File.separator+"applicationContext.xml");
+						}
 					}
 				}
 			}
-
-//			while (true) {
-//			}
 
 		} catch (Exception e) {
 			e.printStackTrace();

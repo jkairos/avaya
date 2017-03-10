@@ -21,6 +21,7 @@ cp -fr target/classes/templates/*.* $HOME/qpc/templates
 cp -fr target/classes/db/*.sql $HOME/qpc/db
 cp -fr target/classes/*.properties $HOME/qpc
 cp -fr target/classes/*.xml $HOME/qpc
+cp -fr target/classes/config/prod/*.xml $HOME/qpc
 cp -fr target/qpc-jar-with-dependencies.jar $HOME/qpc
 cp -fr queue-monitoring.sh $HOME/qpc
 chmod a+x $HOME/qpc/queue-monitoring.sh

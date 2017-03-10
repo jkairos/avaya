@@ -37,6 +37,7 @@ public class Constants {
 	public static final String OUTG_INTERVAL="interval.to.resend.email.outg";
 	public static final String CONTRACT_TEAM_HANDLERS="contract.team.handlers";
 	public static final String QUEUE_OWNER="queue.owner";
+	public static final String APP_SHORT_NAME="app.shortName";
 	public static final String SBI="SBI";
 	public static final String BI="BI";
 	public static final String NSI="NSI";
