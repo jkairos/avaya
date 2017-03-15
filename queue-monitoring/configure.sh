@@ -11,7 +11,9 @@ mkdir $HOME/qpc
 
 echo "Setting Up Application"
 mkdir $HOME/qpc/contracts
-mkdir $HOME/qpc/res
+mkdir $HOME/qpc/res_queue
+mkdir $HOME/qpc/res_overdue
+mkdir $HOME/qpc/res_pending
 mkdir $HOME/qpc/db
 mkdir $HOME/qpc/templates
 mkdir $HOME/qpc/logs

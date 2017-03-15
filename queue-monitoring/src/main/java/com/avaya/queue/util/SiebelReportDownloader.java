@@ -20,29 +20,102 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.avaya.queue.email.Settings;
 import com.avaya.queue.entity.SR;
 import com.avaya.queue.security.PKIXAuthenticator;
 
-public class QueueMonitoringDownloader {
-	private final static Logger logger = Logger.getLogger(QueueMonitoringDownloader.class);
+public class SiebelReportDownloader {
+	private final static Logger logger = Logger.getLogger(SiebelReportDownloader.class);
+	private String userHome = System.getProperty("user.home");
+	private String urlSiebel;
+	private String fileName;
+	private String resPath;
 
-	public List<SR> getQueueList() {
-		List<SR> queueList = new ArrayList<SR>();
-		this.getList(Constants.ID_OPEN_SRS, queueList);
-		this.getList(Constants.ID_OPEN_ACTS, queueList);
-		return queueList;
+	public SiebelReportDownloader(String urlSiebel, String fileName, String resPath) {
+		this.urlSiebel = urlSiebel;
+		this.fileName = fileName;
+		this.resPath=resPath;
 	}
 
-	private List<SR> getList(String spanId, List<SR> queueList) {
-		File input = new File(Constants.QUEUE_FILE);
+	public List<SR> getOverdueSrs(String fileName) {
+		List<SR> queueList = new ArrayList<SR>();
+		File input = new File(userHome+File.separator+"qpc"+File.separator+resPath+File.separator + fileName);
 		SR sr = null;
 		try {
 			Document doc = null;
 			try {
 				doc = Jsoup.parse(input, "UTF-8");
 			} catch (FileNotFoundException e) {
-				input = new File(Constants.PROJECT_PATH + "res" + File.separator + "queue.html");
+				input = new File(Constants.PROJECT_PATH + resPath + File.separator + fileName);
+				doc = Jsoup.parse(input, "UTF-8");
+			}
+			// Strip the table from the page
+			Element table = doc.select("table[class=tableBorder]").get(1);
+			// SRs
+			// Table
+			// Strip the rows from the table
+			Elements tbRows = table.select("tr");
+			String owner="";
+			String lastUpdate="";
+			int i = 1;// Skips Table's header
+			while (i < tbRows.size()) {
+				Element row = tbRows.get(i);
+				Elements tds = row.select("td");
+				sr = new SR();
+				// SRS
+				sr.setNumber(tds.get(0).text());
+				sr.setSev(tds.get(1).text());
+				sr.setTscs(tds.get(2).text());
+				sr.setNcs(tds.get(3).text());
+				sr.setAge(tds.get(4).text());
+				char ownerCharA[]=tds.get(6).text().toCharArray();
+				for (char c : ownerCharA) {
+					if(c!= ' '){
+						owner+=c;
+					}
+				}
+				
+				owner=owner.trim();
+				sr.setOwner(owner);
+				owner="";
+				sr.setStatus(tds.get(7).text());
+				sr.setLastStatusNote(tds.get(11).html());
+				//Last Update
+				char lastUpdateA[]=tds.get(41).text().toCharArray();
+				for (char c : lastUpdateA) {
+					if(c!= ' '){
+						lastUpdate+=c;
+					}
+				}
+				
+				lastUpdate=lastUpdate.trim();
+				sr.setLastUpdate(lastUpdate);
+				lastUpdate="";
+				queueList.add(sr);
+				i++;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e);
+		}
+		return queueList;
+	}
+
+	public List<SR> getQueueList(String fileName) {
+		List<SR> queueList = new ArrayList<SR>();
+		this.getQueueList(Constants.ID_OPEN_SRS, queueList, fileName);
+		this.getQueueList(Constants.ID_OPEN_ACTS, queueList, fileName);
+		return queueList;
+	}
+
+	private List<SR> getQueueList(String spanId, List<SR> queueList, String fileName) {
+		File input = new File(userHome+File.separator+"qpc"+File.separator+resPath+File.separator + fileName);
+		SR sr = null;
+		try {
+			Document doc = null;
+			try {
+				doc = Jsoup.parse(input, "UTF-8");
+			} catch (FileNotFoundException e) {
+				input = new File(Constants.PROJECT_PATH + resPath + File.separator + fileName);
 				doc = Jsoup.parse(input, "UTF-8");
 			}
 			// Strip the table from the page
@@ -52,7 +125,7 @@ public class QueueMonitoringDownloader {
 			// Strip the rows from the table
 			Elements tbRows = table.select("tr");
 
-			int i = 2;//Skips Table's header
+			int i = 2;// Skips Table's header
 			while (i < tbRows.size()) {
 				Element row = tbRows.get(i);
 				if (row.id().isEmpty() && !row.hasAttr("class")) {
@@ -109,15 +182,15 @@ public class QueueMonitoringDownloader {
 			e.printStackTrace();
 			logger.error(e);
 		}
-		
+
 		return queueList;
 	}
-	
+
 	public void readUrl() {
 		URL url;
 
 		try {
-			url = new URL(Constants.QUEUE_MONITORING_URL);
+			url = new URL(urlSiebel);
 			PKIXAuthenticator.authenticate();
 			HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 			System.setProperty("http.maxRedirects", "100");
@@ -131,14 +204,14 @@ public class QueueMonitoringDownloader {
 
 			try {
 				// save to this filename
-				file = new File(Constants.QUEUE_FILE);
+				file = new File(userHome+File.separator+"qpc"+File.separator+resPath+File.separator + fileName);
 
 				if (!file.exists()) {
 					file.createNewFile();
 				}
 
 			} catch (IOException ioe) {
-				file = new File(Constants.PROJECT_PATH + "res" + File.separator + "queue.html");
+				file = new File(Constants.PROJECT_PATH + resPath + File.separator + fileName);
 				if (!file.exists()) {
 					file.createNewFile();
 				}

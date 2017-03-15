@@ -193,7 +193,7 @@ public class AsyncEmailer extends Thread {
 	}
 
 	static {
-		log.info("setting up security provider");
+		log.debug("setting up security provider");
 		Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
 	}
 
@@ -224,9 +224,9 @@ public class AsyncEmailer extends Thread {
 
 	@Override
 	public void run() {
-		this.fromAddress = Settings.getString("email.from.address");
-		this.fromName = Settings.getString("email.name");
-		this.to = Settings.getString("email.to.address");
+		this.fromAddress = fromAddress == null || fromAddress.isEmpty() ? Settings.getString("email.from.address") : fromAddress;
+		this.fromName = fromName == null || fromName.isEmpty() ? Settings.getString("email.name") : fromName;
+		this.to = to == null || to.isEmpty() ? Settings.getString("email.to.address") : to;
 
 		if (!(getHasHtml() || getHasText()))
 			throw new RuntimeException("Need some content");
@@ -235,12 +235,12 @@ public class AsyncEmailer extends Thread {
 		if (!getHasTo())
 			throw new RuntimeException("Need a to address");
 		if (to.endsWith("@example.com")) {
-			log.info("ignoring email request to: " + to);
+			log.debug("ignoring email request to: " + to);
 			return;
 		}
 
 		/*
-		 * if (Util.unsubscribed(to)) { log.info("ingoring on unsub: " + to);
+		 * if (Util.unsubscribed(to)) { log.debug("ingoring on unsub: " + to);
 		 * return; }
 		 */
 		if (!getHasFromAddress()) {
@@ -248,7 +248,7 @@ public class AsyncEmailer extends Thread {
 			fromAddress = Settings.getString("email.default.from.address");
 		}
 		setName("AsyncEmailerThread-" + to);
-		log.info("Setting up email. from:" + fromAddress + " to:" + to + " subject:" + subject);
+		log.debug("Setting up email. from:" + fromAddress + " to:" + to + " subject:" + subject);
 		try {
 
 			Properties properties = new Properties();
@@ -261,8 +261,16 @@ public class AsyncEmailer extends Thread {
 
 			Session session = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(Settings.getString("email.username"),
-							Settings.getString("email.password"));
+					String emailUsername = Settings.getString("email.username");
+					String emailPassword = Settings.getString("email.password");
+					if(emailUsername == null){
+						emailUsername = Settings.getString("email.username");
+					}
+					
+					if(emailPassword == null){
+						emailPassword = Settings.getString("email.password");	
+					}
+					return new PasswordAuthentication(emailUsername,emailPassword);
 				}
 			});
 
@@ -299,7 +307,7 @@ public class AsyncEmailer extends Thread {
 					toIncludesFrom = true;
 			}
 			if (toIncludesFrom) {
-				log.info("Using default from as to includes from : " + fromAddress + " => " + to + " / " + cc + " / "
+				log.debug("Using default from as to includes from : " + fromAddress + " => " + to + " / " + cc + " / "
 						+ bcc);
 				if (replyTo == null)
 					replyTo = fromAddress;
@@ -308,7 +316,7 @@ public class AsyncEmailer extends Thread {
 			if (fromAddress.indexOf("@yahoo.") > -1 || fromAddress.indexOf("@aol.") > -1
 					|| fromAddress.indexOf("@netflix.") > -1 || fromAddress.indexOf("@cs.") > -1
 					|| fromAddress.indexOf("@emsil.") > -1 || fromAddress.indexOf("@aim.") > -1) {
-				log.info("Not using from address b/c of DMARC issues : " + fromAddress);
+				log.debug("Not using from address b/c of DMARC issues : " + fromAddress);
 				fromAddress = Settings.getString("email.default.from.address");
 			}
 			InternetAddress fromIA = new InternetAddress(fromAddress, fromName, "UTF-8");

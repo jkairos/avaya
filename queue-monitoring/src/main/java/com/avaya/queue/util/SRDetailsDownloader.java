@@ -28,16 +28,18 @@ import com.avaya.queue.security.PKIXAuthenticator;
 
 public class SRDetailsDownloader {
 	private final static Logger logger = Logger.getLogger(SRDetailsDownloader.class);
+	private String userHome = System.getProperty("user.home");
 
-	public List<SR> getSRDetails(List<SR> queueList) {
+	public List<SR> getSRDetails(List<SR> queueList, String path) {
+		logger.info("Setting SR Details");
 		File input = null;
 		Document doc = null;
 		try {
-			this.downloadSrDetails(queueList);
+			this.downloadSrDetails(queueList,path);
 
 			for (SR sr : queueList) {
 				try {
-					input = new File(Constants.RES + sr.getNumber() + ".html");
+					input = new File(path+ File.separator+ sr.getNumber() +".html");
 					doc = Jsoup.parse(input, "UTF-8");
 				} catch (FileNotFoundException e) {
 					input = new File(Constants.PROJECT_PATH + "res" + File.separator + sr.getNumber() + ".html");
@@ -53,7 +55,7 @@ public class SRDetailsDownloader {
 				Element contactPhone = doc.getElementById(Constants.ID_SR_CONTACT_PHONE);
 				Element contactEmail = doc.getElementById(Constants.ID_SR_CONTACT_EMAIL);
 				Element prefLanguage = doc.getElementById(Constants.ID_SR_CONTACT_PREF_LANGUAGE);
-
+				Element type = doc.getElementById(Constants.ID_TYPE);
 				sr.setProductEntitled(productEntitlement.text());
 				sr.setAccount(account.text());
 				sr.setDescription(srDescription.text());
@@ -61,11 +63,12 @@ public class SRDetailsDownloader {
 				sr.setParentName(parentName.text());
 				String str = securityRestricted.text();
 				sr.setSecurityRestricted(str.equals("Y") ? Boolean.TRUE : Boolean.FALSE);
-				sr.setCaseEntries(this.getCaseEntries(sr));
+				sr.setCaseEntries(this.getCaseEntries(sr,path));
 				sr.setNameContact(contactName.text());
 				sr.setPhoneContact(contactPhone.text());
 				sr.setEmailContact(contactEmail.text());
 				sr.setPrefLanguage(prefLanguage.text());
+				sr.setType(type.text());
 				// Checks whether the SR has been sent back to queue or not by
 				// the contract team
 				sr.setSentBackToQueueByAccountTeam(this.isSrSentBackToQueueByAccountTeam(doc, sr));
@@ -74,6 +77,7 @@ public class SRDetailsDownloader {
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e);
+			throw new RuntimeException(e);
 		}
 
 		return queueList;
@@ -90,18 +94,18 @@ public class SRDetailsDownloader {
 		String previousOwner = null;
 		String currentOwner = null;
 		String allowedHandlers = Settings.getString(Constants.CONTRACT_TEAM_HANDLERS);
-		allowedHandlers=allowedHandlers.toLowerCase();
+		allowedHandlers = allowedHandlers.toLowerCase();
 		String queueHandle = Settings.getString(Constants.QUEUE_OWNER);
-		queueHandle=queueHandle.toLowerCase();
+		queueHandle = queueHandle.toLowerCase();
 
 		int i = 2;// Skips Table's header
 		while (i < tbRows.size()) {
 			Element row = tbRows.get(i);
 			Elements tds = row.select("td");
 			previousOwner = tds.get(2).text();
-			previousOwner=previousOwner.toLowerCase();
+			previousOwner = previousOwner.toLowerCase();
 			currentOwner = tds.get(4).text();
-			currentOwner=currentOwner.toLowerCase();
+			currentOwner = currentOwner.toLowerCase();
 			break;
 		}
 
@@ -115,8 +119,9 @@ public class SRDetailsDownloader {
 		return isSentBack;
 	}
 
-	public List<Activity> getCaseEntries(SR sr) {
-		File input = new File(Constants.RES + File.separator + sr.getNumber() + ".html");
+	public List<Activity> getCaseEntries(SR sr, String path) {
+		logger.info("Getting Case Entries For SR " + sr.getNumber());
+		File input = new File(path + File.separator  + sr.getNumber() + ".html");
 		boolean isGetContent = false;
 		int trCountForDescription = 0;
 		List<Activity> caseEntriesList = new ArrayList<Activity>();
@@ -207,13 +212,14 @@ public class SRDetailsDownloader {
 		return caseEntriesList;
 	}
 
-	private void downloadSrDetails(List<SR> srs) {
+	private void downloadSrDetails(List<SR> srs, String path) {
 		URL url;
 
 		try {
+			PKIXAuthenticator.authenticate();
+
 			for (SR sr : srs) {
-				url = new URL(Constants.SR_DETAILS_URL + sr.getNumber());
-				PKIXAuthenticator.authenticate();
+				url = new URL(Settings.getString(Constants.SR_DETAILS_URL) + sr.getNumber());
 				HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 
 				// open the stream and put it into BufferedReader
@@ -225,7 +231,8 @@ public class SRDetailsDownloader {
 				File file = null;
 
 				try {
-					file = new File(Constants.RES + File.separator + sr.getNumber() + ".html");
+					logger.info("File to Download: " + path+ File.separator+ File.separator + sr.getNumber() + ".html");
+					file = new File(path+ File.separator+sr.getNumber() + ".html");
 
 					if (!file.exists()) {
 						file.createNewFile();
@@ -243,7 +250,6 @@ public class SRDetailsDownloader {
 				// use FileWriter to write file
 				FileWriter fw = new FileWriter(file.getAbsoluteFile());
 				BufferedWriter bw = new BufferedWriter(fw);
-
 				while ((inputLine = br.readLine()) != null) {
 					// System.out.println(inputLine);
 					bw.write(inputLine + "\n");
@@ -251,14 +257,19 @@ public class SRDetailsDownloader {
 
 				bw.close();
 				br.close();
-
 			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			logger.error(e);
+			throw new RuntimeException(e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e);
+			throw new RuntimeException(e);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e);
+			throw new RuntimeException(e);
 		}
 
 	}

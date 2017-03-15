@@ -32,6 +32,9 @@ public class SR {
 	private String prefLanguage;
 	private boolean sentBackToQueueByAccountTeam;
 	private String sentBackToQueueHandle;
+	private String lastStatusNote;
+	private String owner;
+	private String lastUpdate;
 	
 	public String getSeverity() {
 		return severity;
@@ -218,6 +221,27 @@ public class SR {
 	}
 	public void setSentBackToQueueHandle(String sentBackToQueueHandle) {
 		this.sentBackToQueueHandle = sentBackToQueueHandle;
+	}
+	
+	public String getLastStatusNote() {
+		return lastStatusNote;
+	}
+	public void setLastStatusNote(String lastStatusNote) {
+		this.lastStatusNote = lastStatusNote;
+	}
+	
+	public String getOwner() {
+		return owner;
+	}
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+	
+	public String getLastUpdate() {
+		return lastUpdate;
+	}
+	public void setLastUpdate(String lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 	@Override
 	public String toString() { 

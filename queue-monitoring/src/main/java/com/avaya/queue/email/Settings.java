@@ -37,29 +37,29 @@ public class Settings {
 				in = new FileInputStream(Constants.PROJECT_PATH + File.separator + "config.properties");
 			}
 			if (in != null) {
-				log.info("Reading properties from classpath.");
+				log.debug("Reading properties from classpath.");
 				Properties properties = new Properties();
 				properties.load(in);
 				in.close();
 				Context context = null;
 				try {
 					context = new InitialContext();
-					log.info("Found JNDI Context : " + context.getNameInNamespace());
+					log.debug("Found JNDI Context : " + context.getNameInNamespace());
 				} catch (NoInitialContextException e) {
 					// e.g. unit tests
 					context = null;
-					log.info("No JNDI Context.");
+					log.debug("No JNDI Context.");
 				} catch (NamingException e) {
 					throw new RuntimeException(e);
 				}
 				for (String key : properties.stringPropertyNames()) {
 					MAP.put(key, properties.getProperty(key));
-					log.info("Loaded property : " + key);
+					log.debug("Loaded property : " + key);
 					if (context != null) {
 						try {
 							Object fromJndi = context.lookup("java:comp/env/" + key);
 							if (fromJndi != null) {
-								log.info("Also found in JNDI, overriding.");
+								log.debug("Also found in JNDI, overriding.");
 								MAP.put(key, fromJndi);
 							}
 						} catch (NoInitialContextException e) {
@@ -77,14 +77,14 @@ public class Settings {
 	}
 
 	public static void set(String key, Object value) {
-		if (MAP == null){
+		if (MAP == null)
 			setUp();
-		}
 		MAP.put(key, value);
 	}
 
 	public static Object get(String key) {
-		setUp();
+		if (MAP == null)
+			setUp();
 		return MAP.get(key);
 	}
 
@@ -93,9 +93,8 @@ public class Settings {
 	}
 
 	public static String getString(String key) {
-		if (!isSet(key)){
+		if (!isSet(key))
 			throw new RuntimeException("missing setting : " + key);
-		}
 		return (String) get(key);
 	}
 
@@ -105,15 +104,12 @@ public class Settings {
 
 	public static boolean getBoolean(String key) {
 		Object value = get(key);
-		if (value == null){
+		if (value == null)
 			return false;
-		}
-		if (value instanceof Boolean){
+		if (value instanceof Boolean)
 			return ((Boolean) value).booleanValue();
-		}
-		if (value instanceof String){
+		if (value instanceof String)
 			return value != null && ((String) value).equals("true");
-		}
 		return false;
 	}
 

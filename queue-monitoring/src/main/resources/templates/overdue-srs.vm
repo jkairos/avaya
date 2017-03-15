@@ -1,0 +1,100 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			$css
+		</style>
+	</head>
+	<body>
+	    <table class="employeeMessageContainer">
+			<tr>
+	         <td class="fullNoBorderContainer" colspan="2">
+	         	<b><font color="#0000ff"><u>The latest SR update was performed on $!sr.lastUpdate ($!days days ago).</u></font>
+	         	<p> $!sr.owner, please update the SR with the latest status.</b></p>
+	         </td>
+	        </tr>
+	        <tr>
+	        	<td>&nbsp;</td>
+	        </tr>
+		    <tr>
+		       <td class="fullBorderContainer" colspan="2"><b>Service Request Details</b></td>
+		    </tr>
+		    <tr>
+         		<td class="employeeLabelContainer"><b>Service Request ID</b></td>
+         		<td class="employeeValueContainer">
+         			<a href="https://report.avaya.com/siebelreports/casedetails.aspx?case_id=$!sr.number">$!sr.number</a>
+         		</td>
+         	</tr>
+		    <tr>
+		        <td class="employeeLabelContainer" style="background-color: yellow; color: black"><b>Business Severity</b></td>
+		        <td class="employeeValueContainer" style="background-color: yellow; color: black">$!sr.severity</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Type</b></td>
+		        <td class="employeeValueContainer">$!sr.type</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer" style="background-color: yellow; color: black"><b>Security Restricted</b></td>
+		        <td class="employeeValueContainer" style="background-color: yellow; color: black">#if($!sr.securityRestricted) YES #else NO #end</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Account Name:</b></td>
+		        <td class="employeeValueContainer">$!sr.account</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Parent Name:</b></td>
+		        <td class="employeeValueContainer">$!sr.parentName</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Product</b></td>
+		        <td class="employeeValueContainer">$!sr.productEntitled</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer" style="background-color: yellow; color: black"><b>Description</b></td>
+		        <td class="employeeValueContainer" style="background-color: yellow; color: black"> $!sr.description</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Last Update</b></td>
+		        <td class="employeeValueContainer">$!sr.lastUpdate</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Last Status Note</b></td>
+		        <td class="employeeValueContainer">$!sr.lastStatusNote</td>
+		    </tr>
+		</table>
+		<br>
+		<table class="tableBorder" width="100%" cellspacing="0">
+			<tbody>
+				<tr class="headRowV3">
+					<td colspan="2"><span class="blacktext" style="color:White;font-weight:bold;">SR Contact</span></td>
+				</tr>
+				<tr>
+					<td><span class="blacktext" style="font-weight:bold;">Name</span></td>
+					<td><span id="lReportedByName" class="blacktext">$!sr.nameContact</span></td>
+				</tr>
+				<tr>
+					<td><span class="blacktext" style="font-weight:bold;">Phone</span></td>
+					<td><span id="lReportedByPhone" class="blacktext">$!sr.phoneContact</span></td>
+				</tr>
+				<tr>
+					<td><span class="blacktext" style="font-weight:bold;">Email</span></td>
+					<td><a id="hlReportedByEmail" class="blacktext" href="https://report.avaya.com/siebelreports/contactdrill.aspx?emailorsso=$!sr.emailContact">$!sr.emailContact</a></td>
+				</tr>
+				<tr>
+					<td><span class="blacktext" style="font-weight:bold;">Pref Language</span></td>
+					<td><span id="lReportedByPrefLang" class="blacktext">$!sr.prefLanguage</span></td>
+				</tr>
+			</tbody>
+		</table>
+		<br>	
+   		<table class="employeeMessageContainer">
+   			<tr>
+         		<td class="empSubLabelContainer">
+         			<span class="legalFooter">
+						<font color="#ff0000">CONFIDENTIALITY NOTICE:</font><br>This notification message is for the sole use of the intended recipient(s) and contains confidential and proprietary company information.  Any unauthorized review, use, disclosure or distribution especially  to Customers or Business Partners is strictly prohibited<font color="#0000ff"> and is a Code of Conduct violation</font>.
+				    </span>
+         		</td>
+      		</tr>
+   		</table>
+	</body>
+</html>

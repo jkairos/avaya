@@ -56,6 +56,11 @@
 		<property name="jobClass" value="com.avaya.queue.job.QueuePendingSrsJob" />
 		<property name="durability" value="true" />
 	</bean>
+
+	<bean name="overdueSrsJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.avaya.queue.job.OverdueSrsJob" />
+		<property name="durability" value="true" />
+	</bean>
 	
 	<!-- 
 	Name	       Required	      Allowed Values	     Allowed Special Characters
@@ -70,7 +75,7 @@
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
 	<bean id="cronTriggerQueueJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueJob" />
-		<property name="cronExpression" value="0/230 0/1 * ? * 1-5" />
+		<property name="cronExpression" value="0/60 0/1 * ? * 1-5" />
 	</bean>
 
 	<bean id="cronTriggerQueueJobWeekend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -81,7 +86,15 @@
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
 	<bean id="cronTriggerQueuePendingSrsJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queuePendingSrsJob" />
-		<property name="cronExpression" value="0 0 0/2 ? * 1-5" />
+		<!--<property name="cronExpression" value="0 0 0/2 ? * 1-5" />-->
+		<property name="cronExpression" value="0/60 0/1 * ? * 1-5" />
+	</bean>
+
+	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
+	<!-- Fires Every Day at 00:00 -->
+	<bean id="cronTriggerOverdueSrsJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="overdueSrsJob" />
+		<property name="cronExpression" value="0 06 21 ? * 1-5" />
 	</bean>
 
 	<!-- Scheduler factory bean to glue together jobDetails and triggers to 
@@ -91,14 +104,16 @@
 			<list>
 				<ref bean="queueJob" />
 				<ref bean="queuePendingSrsJob" />
+				<ref bean="overdueSrsJob" />
 			</list>
 		</property>
 
 		<property name="triggers">
 			<list>
-				<ref bean="cronTriggerQueueJobWeekDays" />
+				 <ref bean="cronTriggerQueueJobWeekDays" />
 				<ref bean="cronTriggerQueueJobWeekend" />
 				<ref bean="cronTriggerQueuePendingSrsJobWeekDays" />
+				<!-- <ref bean="cronTriggerOverdueSrsJob" /> -->
 			</list>
 		</property>
 	</bean>

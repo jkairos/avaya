@@ -1,6 +1,5 @@
 package com.avaya.queue.job;
 
-import java.io.File;
 import java.util.List;
 
 import org.apache.velocity.VelocityContext;
@@ -12,31 +11,22 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import com.avaya.queue.entity.SR;
 import com.avaya.queue.util.Constants;
-import com.avaya.queue.util.QueueMonitoringDownloader;
 import com.avaya.queue.util.SRDetailsDownloader;
+import com.avaya.queue.util.SiebelReportDownloader;
 
 public abstract class ApplicationJob extends QuartzJobBean{
 	protected SRDetailsDownloader srDetaildDownloader = new SRDetailsDownloader();
-	protected QueueMonitoringDownloader getUrlContent = new QueueMonitoringDownloader();
+	protected SiebelReportDownloader siebelReportDownloader;
 	protected VelocityEngine velocityEngine;
 	protected VelocityContext context;
-	
+	protected String userHome = System.getProperty("user.home");
+
 	protected void executeInternal(JobExecutionContext jobContext) throws JobExecutionException {
 		this.cleanup();
 		this.setupVelocityEngine();
 		this.processQueue();
 	}
 
-	private void cleanup() {
-		File file = new File(Constants.APP_PATH + File.separator + "res");
-		if (file.exists()) {
-			File[] files = file.listFiles();
-			for (File file2 : files) {
-				file2.delete();
-			}
-		}
-	}
-	
 	private void setupVelocityEngine(){
 		/**
 		 * Initialize engine
@@ -56,6 +46,7 @@ public abstract class ApplicationJob extends QuartzJobBean{
 
 	}
 	
+	public abstract void cleanup();
 	public abstract void processQueue();
-	public abstract void sendEmail(List<SR> queueList);
+	public abstract void processEmailToSend(List<SR> queueList);
 }
