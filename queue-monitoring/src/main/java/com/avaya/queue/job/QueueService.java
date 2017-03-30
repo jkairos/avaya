@@ -214,18 +214,22 @@ public class QueueService {
 				} else {
 					manualDate = cc.getManualDate();
 					logger.info("manual date: " + manualDate);
-					manualDate = manualDate.substring(manualDate.indexOf("-") + 1, manualDate.length());
-					manualDate = manualDate.trim();
-					endContract = fmt.parseLocalDate(manualDate);
+					if(manualDate!=null){
+						manualDate = manualDate.substring(manualDate.indexOf("-") + 1, manualDate.length());
+						manualDate = manualDate.trim();
+						endContract = fmt.parseLocalDate(manualDate);
+					}
 				}
-				DateTime endContractDt = new DateTime(endContract.year().get(), endContract.monthOfYear().get(),
-						endContract.dayOfMonth().get(), 23, 59, 59);
-
-				// Contract still valid
-				if (endContractDt.isAfterNow() || endContractDt.isEqualNow()) {
-					customerContractsToProcess.add(cc);
+				if(endContract!=null){
+					DateTime endContractDt = new DateTime(endContract.year().get(), endContract.monthOfYear().get(),
+							endContract.dayOfMonth().get(), 23, 59, 59);
+					
+					// Contract still valid
+					if (endContractDt.isAfterNow() || endContractDt.isEqualNow()) {
+						customerContractsToProcess.add(cc);
+					}
+					
 				}
-
 			}
 		}
 

@@ -66,10 +66,11 @@ public class QueueTestJob extends ApplicationJob {
 
 //			List<SR> queueList = siebelReportDownloader.getQueueList(Constants.QUEUE_FILE_NAME);
 			SR sr = new SR();
-			sr.setFl("51578832");
-			sr.setFlName("OI SA");
-			sr.setAccount("Oi SA");
-			sr.setNumber("1-12694649062");
+			sr.setFl("51394673");
+			sr.setFlName("HEWLETT-PACKARD MULTIMEDIA SDN BHD");
+			sr.setAccount("HEWLETT-PACKARD MULTIMEDIA SDN BHD");
+			sr.setParentName("HP Corona");
+			sr.setNumber("1-12710095034");
 			sr.setSev("BI");
 			
 			List<SR> queueList = new ArrayList<SR>();
