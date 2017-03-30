@@ -18,7 +18,7 @@ import javax.net.ssl.X509ExtendedTrustManager;
 
 import com.avaya.queue.util.QueueMonitoringProperties;
 
-public class PKIXAuthenticator {
+public class PKIXAuthenticator{
 	
 	public static void authenticate(){
 	

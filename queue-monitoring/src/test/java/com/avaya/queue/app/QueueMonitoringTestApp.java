@@ -7,16 +7,15 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.avaya.queue.db.ScriptUtil;
-import com.avaya.queue.security.PKIXAuthenticator;
 import com.avaya.queue.util.Constants;
 import com.avaya.queue.util.QueueMonitoringProperties;
 
-public class QueueMonitoringApp {
+public class QueueMonitoringTestApp {
 	public static ApplicationContext context;
 
 	public static void main(String[] args) {
 		try {
-			PKIXAuthenticator.authenticate();
+
 			if (Boolean.valueOf(QueueMonitoringProperties.getProperty("create.insert.file"))) {
 				ScriptUtil script = new ScriptUtil();
 				script.createInsertContractsScript();

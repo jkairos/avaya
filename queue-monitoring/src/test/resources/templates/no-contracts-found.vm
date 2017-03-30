@@ -7,10 +7,22 @@
 	</head>
 	<body>
 	    <table class="employeeMessageContainer">
+	    #if( $reminder > 0 )
 			<tr>
+		         <td class="fullNoBorderContainer" colspan="2">
+		         	<b><i><u><font color="red">$reminder# REMINDER: The SR has not been owned by anyone yet.#if($sr.sev=="SBI") This is a SEVERE BUSINESS IMPACT (SBI) #elseif($sr.sev=="OUTG") This is an OUTAGE#end</font></u></i></b>
+		         </td>
+	        </tr>
+			<tr>
+		         <td class="fullNoBorderContainer" colspan="2">
+		         	&nbsp;
+		         </td>
+	        </tr>
+		#end
+		<tr>
 	         <td class="fullNoBorderContainer" colspan="2">
-	         	<b><font color="#0000ff"><u>The latest SR update was performed on $!sr.lastUpdate - $!sr.lastUpdateInterval #if($!sr.intervalUpdate == "DAY") day(s) ago #else hour(s) ago#end.</u></font>
-	         	<p> $!sr.ownerName, please update the SR with the latest status.</b></p>
+	         	<b><font color="red">NO CONTRACTS FOUND FOR CUSTOMER $!sr.account</font>.
+	         	RESPONSIBLE FOR THE QUEUE MONITORING SLOT PLEASE DETERMINE CUSTOMER'S ENTITLEMENT.</b>
 	         </td>
 	        </tr>
 	        <tr>
@@ -38,12 +50,20 @@
 		        <td class="employeeValueContainer" style="background-color: yellow; color: black">#if($!sr.securityRestricted) YES #else NO #end</td>
 		    </tr>
 		    <tr>
-		        <td class="employeeLabelContainer"><b>Account Name:</b></td>
-		        <td class="employeeValueContainer">$!sr.account</td>
+		        <td class="employeeLabelContainer"><b>FL</b></td>
+		        <td class="employeeValueContainer"><a href="https://report.avaya.com/siebelreports/fldrill.aspx?site_id=00$!sr.fl">00$!sr.fl</a></td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>FL Name:</b></td>
+		        <td class="employeeValueContainer">$!sr.flName</td>
 		    </tr>
 		    <tr>
 		        <td class="employeeLabelContainer"><b>Parent Name:</b></td>
 		        <td class="employeeValueContainer">$!sr.parentName</td>
+		    </tr>
+		    <tr>
+		        <td class="employeeLabelContainer"><b>Product Skill</b></td>
+		        <td class="employeeValueContainer">$!sr.productSkill</td>
 		    </tr>
 		    <tr>
 		        <td class="employeeLabelContainer"><b>Product</b></td>
@@ -54,12 +74,12 @@
 		        <td class="employeeValueContainer" style="background-color: yellow; color: black"> $!sr.description</td>
 		    </tr>
 		    <tr>
-		        <td class="employeeLabelContainer"><b>Last Update</b></td>
-		        <td class="employeeValueContainer">$!sr.lastUpdate</td>
+		        <td class="employeeLabelContainer"><b>Account</b></td>
+		        <td class="employeeValueContainer">$!sr.account</td>
 		    </tr>
 		    <tr>
-		        <td class="employeeLabelContainer"><b>Last Status Note</b></td>
-		        <td class="employeeValueContainer">$!sr.lastStatusNote</td>
+		        <td class="employeeLabelContainer"><b>Country</b></td>
+		        <td class="employeeValueContainer">$!sr.country</td>
 		    </tr>
 		</table>
 		<br>
@@ -86,10 +106,50 @@
 				</tr>
 			</tbody>
 		</table>
+		<br>
+		<br>	
+   		<table class="employeeMessageContainer">
+   			<tr>
+   				<td>
+   					<span class="legalFooter"> 
+   						<b>SR NOTES</b>
+   					</span>
+   				</td>
+   			</tr>
+   		</table>
+		<table class="tableBorder" width="100%" cellspacing="0">
+			<tr class="headRowV3">
+			    <th>Type</th>
+			    <th>Created By</th>
+			    <th>Date Created</th>
+			    <th>Status</th>
+			    <th>Private</th>
+			    <th>Assignment Time</th>
+			    <th>Owner</th>
+			</tr>
+			#foreach ($activity in $!caseEntries)
+			    <tr>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end"><b>$!activity.type</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end"><b>$!activity.createdBy</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end"><b>$!activity.dateCreated</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end"><b>$!activity.status</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end"><b>$!activity.privateNote</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end"><b>$!activity.assignmentTime</b></td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end"><b>$!activity.owner</b></td>
+			    </tr>
+			    <tr>
+			      <td colspan="7" class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #end">$!activity.description</td>
+			    </tr>
+			#end
+		</table>
+		<br>
 		<br>	
    		<table class="employeeMessageContainer">
    			<tr>
          		<td class="empSubLabelContainer">
+         			<b>* This notification was generated by the Queue Pre-Checking Application and serves as help for the queue monitoring engineer, who must verify the determine the entitlement of the customer </b>
+         			<br>
+         			<br>
          			<span class="legalFooter">
 						<font color="#ff0000">CONFIDENTIALITY NOTICE:</font><br>This notification message is for the sole use of the intended recipient(s) and contains confidential and proprietary company information.  Any unauthorized review, use, disclosure or distribution especially  to Customers or Business Partners is strictly prohibited<font color="#0000ff"> and is a Code of Conduct violation</font>.
 				    </span>

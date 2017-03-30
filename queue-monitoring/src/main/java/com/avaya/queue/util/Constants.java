@@ -24,6 +24,9 @@ public class Constants {
 	public static final String ID_PRODUCT_ENTITLEMENT="lProduct";
 	public static final String ID_SR_DESCRIPTION="lCASEDESCRIPTION";
 	public static final String ID_ACCOUNT="lSiteName";
+	public static final String ID_FL="lFLCode";
+	public static final String ID_COUNTRY="lFLCountry";
+	public static final String ID_OP_SKILL="lOpSkill";
 	public static final String ID_SEVERITY="lSeverity";
 	public static final String ID_PARENT_NAME="lParentName";
 	public static final String ID_SR_CONTACT_NAME="lReportedByName";
@@ -32,6 +35,7 @@ public class Constants {
 	public static final String ID_SR_CONTACT_PREF_LANGUAGE="lReportedByPrefLang";
 	public static final String ID_TYPE="lType";
 	public static final String ID_SECURITY_RESTRICTED="lSecurityRestricted";
+	public static final String ID_USERNAME="hlName";
 	public static final String CONTRACTS_XLSX=APP_PATH+"contracts"+File.separator+"contracts.xlsx";
 	public static final String MANUAL_CONTRACTS_XLSX=APP_PATH+"contracts"+File.separator+"manual-contracts.xlsx";
 	public static final String INSERT_DATA_FILE=APP_PATH+"db"+File.separator+"insert-data.sql";
@@ -49,6 +53,8 @@ public class Constants {
 	public static final String OVERDUE_SRS_URL="overdue.srs.url";
 	public static final String ARCHITECTS_EMAILS="architects.emails";
 	public static final String MANAGERS_EMAILS="managers.emails";
+	public static final String USER_DETAILS="user.handle.details";
+	public static final String SIEBEL_EMAIL_ADDRESS="siebel.email.address";
 	public static final String CSS="body { "
 +"	color: #ffffff; "
 +"	margin: 0; "

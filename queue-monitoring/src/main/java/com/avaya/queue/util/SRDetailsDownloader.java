@@ -28,23 +28,26 @@ import com.avaya.queue.security.PKIXAuthenticator;
 
 public class SRDetailsDownloader {
 	private final static Logger logger = Logger.getLogger(SRDetailsDownloader.class);
-	private String userHome = System.getProperty("user.home");
 
 	public List<SR> getSRDetails(List<SR> queueList, String path) {
 		logger.info("Setting SR Details");
 		File input = null;
 		Document doc = null;
 		try {
-			this.downloadSrDetails(queueList,path);
+			this.downloadSrDetails(queueList, path);
 
 			for (SR sr : queueList) {
 				try {
-					input = new File(path+ File.separator+ sr.getNumber() +".html");
+					input = new File(path + File.separator + sr.getNumber() + ".html");
 					doc = Jsoup.parse(input, "UTF-8");
 				} catch (FileNotFoundException e) {
 					input = new File(Constants.PROJECT_PATH + "res" + File.separator + sr.getNumber() + ".html");
 					doc = Jsoup.parse(input, "UTF-8");
 				}
+
+				Element fl = doc.getElementById(Constants.ID_FL);
+				Element country = doc.getElementById(Constants.ID_COUNTRY);
+				Element opSkill = doc.getElementById(Constants.ID_OP_SKILL);
 				Element productEntitlement = doc.getElementById(Constants.ID_PRODUCT_ENTITLEMENT);
 				Element srDescription = doc.getElementById(Constants.ID_SR_DESCRIPTION);
 				Element account = doc.getElementById(Constants.ID_ACCOUNT);
@@ -56,14 +59,33 @@ public class SRDetailsDownloader {
 				Element contactEmail = doc.getElementById(Constants.ID_SR_CONTACT_EMAIL);
 				Element prefLanguage = doc.getElementById(Constants.ID_SR_CONTACT_PREF_LANGUAGE);
 				Element type = doc.getElementById(Constants.ID_TYPE);
+
+				String flStr = fl.text();
+				String str = securityRestricted.text();
+
+				if (!flStr.isEmpty()) {
+					flStr = flStr.trim();
+					char f[] = flStr.toCharArray();
+					int index = 0;
+					while (index < f.length && Character.isDigit(f[index])) {
+						index++;
+					}
+
+					flStr = flStr.substring(0,index);
+					flStr = flStr.replaceFirst("^0+(?!$)", "");
+				}
+
+				sr.setFl(flStr);
+				sr.setProductSkill(opSkill.text());
+				sr.setCountry(country.text());
 				sr.setProductEntitled(productEntitlement.text());
 				sr.setAccount(account.text());
+				sr.setFlName(account.text());
 				sr.setDescription(srDescription.text());
 				sr.setSeverity(severity.text());
 				sr.setParentName(parentName.text());
-				String str = securityRestricted.text();
 				sr.setSecurityRestricted(str.equals("Y") ? Boolean.TRUE : Boolean.FALSE);
-				sr.setCaseEntries(this.getCaseEntries(sr,path));
+				sr.setCaseEntries(this.getCaseEntries(sr, path));
 				sr.setNameContact(contactName.text());
 				sr.setPhoneContact(contactPhone.text());
 				sr.setEmailContact(contactEmail.text());
@@ -121,7 +143,7 @@ public class SRDetailsDownloader {
 
 	public List<Activity> getCaseEntries(SR sr, String path) {
 		logger.info("Getting Case Entries For SR " + sr.getNumber());
-		File input = new File(path + File.separator  + sr.getNumber() + ".html");
+		File input = new File(path + File.separator + sr.getNumber() + ".html");
 		boolean isGetContent = false;
 		int trCountForDescription = 0;
 		List<Activity> caseEntriesList = new ArrayList<Activity>();
@@ -231,8 +253,9 @@ public class SRDetailsDownloader {
 				File file = null;
 
 				try {
-					logger.info("File to Download: " + path+ File.separator+ File.separator + sr.getNumber() + ".html");
-					file = new File(path+ File.separator+sr.getNumber() + ".html");
+					logger.info(
+							"File to Download: " + path + File.separator + File.separator + sr.getNumber() + ".html");
+					file = new File(path + File.separator + sr.getNumber() + ".html");
 
 					if (!file.exists()) {
 						file.createNewFile();

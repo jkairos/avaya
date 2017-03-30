@@ -2,53 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:mail="http://www.springframework.org/schema/integration/mail"
-	xmlns:int="http://www.springframework.org/schema/integration"
-	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="
 	http://www.springframework.org/schema/jdbc
 	http://www.springframework.org/schema/jdbc/spring-jdbc-4.1.xsd
 	http://www.springframework.org/schema/beans 
 	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
 	http://www.springframework.org/schema/context 
-	http://www.springframework.org/schema/context/spring-context-4.1.xsd
-	http://www.springframework.org/schema/integration/mail
-    http://www.springframework.org/schema/integration/mail/spring-integration-mail-4.1.xsd 
-    http://www.springframework.org/schema/util 
-    http://www.springframework.org/schema/util/spring-util-4.1.xsd">
-    
-    <context:property-placeholder location="classpath:config.properties" />
-    
-	<!-- MAIL Settings -->
-	<util:properties id="javaMailProperties">
-		<prop key="mail.imap.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
-		<prop key="mail.imap.socketFactory.fallback">false</prop>
-		<prop key="mail.imaps.ssl.trust">*</prop>
-		<prop key="mail.store.protocol">imaps</prop>
-		<prop key="mail.debug">${imap.debug}</prop>
-	</util:properties>
-
-	<mail:inbound-channel-adapter id="imapAdapter"
-		store-uri="${imap.uri}" channel="receiveEmailChannel" 
-		should-delete-messages="false" should-mark-messages-as-read="true"
-		auto-startup="true" java-mail-properties="javaMailProperties">
-		<int:poller fixed-delay="${imap.poolerSecondsDelay}"
-			time-unit="SECONDS" />
-	</mail:inbound-channel-adapter>
-
-	<int:channel id="receiveEmailChannel">
-		<int:interceptors>
-			<int:wire-tap channel="logger" />
-		</int:interceptors>
-	</int:channel>
-
-	<int:logging-channel-adapter id="logger" level="DEBUG" />
-
-	<int:service-activator input-channel="receiveEmailChannel" ref="emailReceiverService" method="receive" />
-
-	<bean id="emailReceiverService" class="com.avaya.queue.email.EmailReceiverService" />
-	
-	<bean id="queueService" class="com.avaya.queue.job.QueueService" />
+	http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
 	<bean id="customerContractDao" class="com.avaya.queue.dao.CustomerContractDaoImpl">
 		<property name="namedParameterJdbcTemplate" ref="jdbcTemplate" />
@@ -58,11 +18,10 @@
 		<property name="namedParameterJdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 	
-	<!-- jdbc:hsqldb:mem:dataSource -->
-	<jdbc:embedded-database id="dataSource" type="HSQL">
-		<jdbc:script location="file:///#{systemProperties['user.home']}/qpc/db/create-db.sql" />
-		<jdbc:script location="file:///#{systemProperties['user.home']}/qpc/db/insert-data.sql" />
-	</jdbc:embedded-database>
+	<jdbc:embedded-database id="dataSource" type="HSQL"> 
+		<jdbc:script location="classpath:/db/create-db.sql" />
+		<jdbc:script location="classpath:/db/insert-data.sql" />
+	</jdbc:embedded-database> 
 
 	<bean id="jdbcTemplate"
 		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
@@ -78,7 +37,7 @@
 	</bean>
 	
 	<bean name="queueJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.avaya.queue.job.QueueJob" />
+		<property name="jobClass" value="com.avaya.queue.app.QueueTestJob" />
 		<property name="durability" value="true" />
 	</bean>
 
@@ -105,28 +64,30 @@
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
 	<bean id="cronTriggerQueueJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueJob" />
-		<property name="cronExpression" value="0/60 0/1 * ? * 1-5" />
+		<property name="cronExpression" value="0 41 15 ? * 1-5" />
 	</bean>
 
 	<bean id="cronTriggerQueueJobWeekend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueJob" />
-		<property name="cronExpression" value="0/180 0/1 * ? * 6-7" />
+		<property name="cronExpression" value="0/500 0/1 * ? * 6-7" />
 	</bean>
 
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
 	<bean id="cronTriggerQueuePendingSrsJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queuePendingSrsJob" />
-		<property name="cronExpression" value="0 0 0/2 ? * MON-FRI" />
+		<!--<property name="cronExpression" value="0 0 0/2 ? * 1-5" />-->
+		<property name="cronExpression" value="0/60 0/1 * ? * 1-5" />
 	</bean>
 
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
 	<!-- Fires Every Day at 00:00 -->
 	<bean id="cronTriggerOverdueSrsJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="overdueSrsJob" />
-		<property name="cronExpression" value="0 0 0 ? * 1-5" />
+		<property name="cronExpression" value="0 55 15 ? * 1-5" />
 	</bean>
-	
-	<!-- Scheduler factory bean to glue together jobDetails and triggers to Configure Quartz Scheduler -->
+
+	<!-- Scheduler factory bean to glue together jobDetails and triggers to 
+		Configure Quartz Scheduler -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
 			<list>
@@ -139,9 +100,9 @@
 		<property name="triggers">
 			<list>
 				<ref bean="cronTriggerQueueJobWeekDays" />
-				<ref bean="cronTriggerQueueJobWeekend" />
+				<!--<ref bean="cronTriggerQueueJobWeekend" />
 				<ref bean="cronTriggerQueuePendingSrsJobWeekDays" />
-				<ref bean="cronTriggerOverdueSrsJob" />
+				<ref bean="cronTriggerOverdueSrsJob" /> -->
 			</list>
 		</property>
 	</bean>

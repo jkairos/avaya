@@ -34,7 +34,10 @@ public class SR {
 	private String sentBackToQueueHandle;
 	private String lastStatusNote;
 	private String owner;
+	private String ownerName;
 	private String lastUpdate;
+	private int lastUpdateInterval;
+	private IntervalUpdate intervalUpdate;
 	
 	public String getSeverity() {
 		return severity;
@@ -242,6 +245,27 @@ public class SR {
 	}
 	public void setLastUpdate(String lastUpdate) {
 		this.lastUpdate = lastUpdate;
+	}
+	
+	public String getOwnerName() {
+		return ownerName;
+	}
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
+	}
+	
+	public int getLastUpdateInterval() {
+		return lastUpdateInterval;
+	}
+	public void setLastUpdateInterval(int lastUpdateInterval) {
+		this.lastUpdateInterval = lastUpdateInterval;
+	}
+	
+	public IntervalUpdate getIntervalUpdate() {
+		return intervalUpdate;
+	}
+	public void setIntervalUpdate(IntervalUpdate intervalUpdate) {
+		this.intervalUpdate = intervalUpdate;
 	}
 	@Override
 	public String toString() { 

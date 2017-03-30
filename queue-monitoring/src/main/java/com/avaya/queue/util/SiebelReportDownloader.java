@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -152,7 +153,28 @@ public class SiebelReportDownloader {
 						sr.setFl(fl);
 						sr.setFlName(tds.get(16).text());
 						sr.setCountry(tds.get(17).text());
-						sr.setOtherSrs(Integer.valueOf(tds.get(18).text()));
+						try{
+							sr.setOtherSrs(Integer.valueOf(tds.get(18).text()));
+						}catch(NumberFormatException nfe){
+							sr.setType(tds.get(4).text());
+							sr.setStatus(tds.get(5).text());
+							sr.setAge(tds.get(6).text());
+							sr.setTscs(tds.get(7).text());
+							sr.setNcs(tds.get(8).text());
+							sr.setBacklogState(tds.get(12).text());
+							sr.setMea(tds.get(13).text().equals("N") ? false : true);
+							sr.setDispOrPart(tds.get(14).text().equals("N") ? false : true);
+							sr.setProductSkill(tds.get(15).text());
+							fl = tds.get(16).text();
+							if (!fl.isEmpty()) {
+								fl = fl.replaceFirst("^0+(?!$)", "");
+								fl = fl.trim();
+							}
+							sr.setFl(fl);
+							sr.setFlName(tds.get(17).text());
+							sr.setCountry(tds.get(18).text());
+							sr.setOtherSrs(Integer.valueOf(tds.get(19).text()));
+						}
 					} else {// Open Collaborations
 						sr.setNumber(tds.get(0).text());
 						sr.setSev(tds.get(1).text());
@@ -230,9 +252,15 @@ public class SiebelReportDownloader {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			logger.error(e);
-		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (SocketTimeoutException se){
+			se.printStackTrace();
+			logger.error(se);
+			throw new RuntimeException(se);
+		}catch (IOException e) {
 			e.printStackTrace();
 			logger.error(e);
+			throw new RuntimeException(e);
 		}
 
 	}

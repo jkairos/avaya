@@ -1,0 +1,66 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			$css
+		</style>
+	</head>
+	<body>
+	    <table class="employeeMessageContainer">
+			<tr>
+	         <td class="fullNoBorderContainer" colspan="2">
+	         	<b>$!ownerName, please update the SRs with the latest statuses. Following the list of your overdue SRs:</b></p>
+	         </td>
+	        </tr>
+	      </table>
+		<br>	
+		<table class="tableBorder" width="100%" cellspacing="0">
+			<tr class="headRowV3">
+			    <th>SR Number</th>
+			    <th>Business Severity</th>
+			    <th>Account Name</th>
+			    <th>Parent Name</th>
+			    <th>Product</th>
+			    <th>Last Update</th>
+			</tr>
+			#foreach ($sr in $!srList)
+				    <tr>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end"><a href="https://report.avaya.com/siebelreports/casedetails.aspx?case_id=$!sr.number">$!sr.number</a></td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!sr.severity</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!sr.account</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!sr.parentName</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!sr.productEntitled</td>
+				        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!sr.lastUpdate - $!sr.lastUpdateInterval #if($!sr.intervalUpdate == "DAY") day(s) ago #else hour(s) ago#end</td>
+				    </tr>
+				    <tr>
+			    		<td colspan="6" class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">
+			    			<b>Description</b>
+			    			<br>$!sr.description
+			    		</td>
+			    	</tr>
+			    	<tr>
+			    		<td colspan="6" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end"> &nbsp; </td>
+			    	</tr>
+			    	<tr>
+			    		<td colspan="6" class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">
+			    			<b>Last Note</b>
+			    			<br>$!sr.lastStatusNote
+			    		</td>
+			    	</tr>
+			    	<tr>
+			    		<td>&nbsp;</td>
+			    	</tr>
+			#end
+		</table>
+		<br>	
+   		<table class="employeeMessageContainer">
+   			<tr>
+         		<td class="empSubLabelContainer">
+         			<span class="legalFooter">
+						<font color="#ff0000">CONFIDENTIALITY NOTICE:</font><br>This notification message is for the sole use of the intended recipient(s) and contains confidential and proprietary company information.  Any unauthorized review, use, disclosure or distribution especially  to Customers or Business Partners is strictly prohibited<font color="#0000ff"> and is a Code of Conduct violation</font>.
+				    </span>
+         		</td>
+      		</tr>
+   		</table>
+	</body>
+</html>

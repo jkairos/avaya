@@ -29,21 +29,20 @@ public class QueuePendingSrsJob extends ApplicationJob {
 		}
 	}	
 	public void processQueue() {
-		logger.info("Begin Process Queue");
-		siebelReportDownloader.readUrl();
-
-		List<SR> queueList = siebelReportDownloader.getQueueList(Constants.QUEUE_PENDING_FILE_NAME);
-		if (logger.isDebugEnabled()) {
-			logger.debug("Current Queue Size: " + queueList.size());
-		}
-		if (queueList != null && !queueList.isEmpty()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("QUEUE IS NOT EMPTY");
+		logger.info("Begin Process QueuePendingSrs");
+		try{
+			siebelReportDownloader.readUrl();
+			
+			List<SR> queueList = siebelReportDownloader.getQueueList(Constants.QUEUE_PENDING_FILE_NAME);
+			logger.info("Current Queue Size: " + queueList.size());
+			if (queueList != null && !queueList.isEmpty()) {
+				srDetailsDownloader.getSRDetails(queueList,userHome + File.separator + "qpc" + File.separator + resDir);
 			}
-			srDetaildDownloader.getSRDetails(queueList,userHome + File.separator + "qpc" + File.separator + resDir);
+			this.processEmailToSend(queueList);
+			logger.info("End Process QueuePendingSrs");
+		}catch(RuntimeException re){
+			logger.error("ERROR READING PENDING SRS ",re);
 		}
-		this.processEmailToSend(queueList);
-		logger.info("End Process Queue");
 	}
 
 	public void processEmailToSend(List<SR> queueList) {

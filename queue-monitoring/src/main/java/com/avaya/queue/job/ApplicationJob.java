@@ -15,7 +15,7 @@ import com.avaya.queue.util.SRDetailsDownloader;
 import com.avaya.queue.util.SiebelReportDownloader;
 
 public abstract class ApplicationJob extends QuartzJobBean{
-	protected SRDetailsDownloader srDetaildDownloader = new SRDetailsDownloader();
+	protected SRDetailsDownloader srDetailsDownloader = new SRDetailsDownloader();
 	protected SiebelReportDownloader siebelReportDownloader;
 	protected VelocityEngine velocityEngine;
 	protected VelocityContext context;
