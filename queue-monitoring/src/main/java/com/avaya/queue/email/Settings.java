@@ -26,13 +26,14 @@ import com.avaya.queue.util.Constants;
 public class Settings {
 	protected final static Log log = LogFactory.getLog("queueMonitoring.settings");
 	private static Map<String, Object> MAP = null;
+	private static String userHome = System.getProperty("user.home");
 
 	private static void setUp() {
 		MAP = new HashMap<String, Object>();
 		try {
 			InputStream in = null;
 			try {
-				in = new FileInputStream(Constants.APP_PATH + File.separator + "config.properties");
+				in = new FileInputStream(userHome+ File.separator + Constants.APP_NAME + File.separator+ "config"+ File.separator + "config.properties");
 			} catch (IOException ioe) {
 				in = new FileInputStream(Constants.PROJECT_PATH + File.separator + "config.properties");
 			}

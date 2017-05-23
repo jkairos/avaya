@@ -99,7 +99,7 @@ public class EmailReceiverService{
 			context.put("css", Constants.CSS);
 		}
 		queueService=(QueueService) QueueMonitoringApp.context.getBean("queueService");
-		srDetailsDownloader.getSRDetails(queueList,userHome + File.separator + "qpc" + File.separator + resDir);
+		srDetailsDownloader.getSRDetails(queueList,userHome + File.separator + Constants.APP_NAME + File.separator + resDir);
 		queueService.processEmailToSend(queueList, velocityEngine, context);
 		logger.info("End processEmailToSend");
 	}

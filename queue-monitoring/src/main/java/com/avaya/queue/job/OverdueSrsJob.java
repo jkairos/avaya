@@ -43,7 +43,7 @@ public class OverdueSrsJob extends ApplicationJob {
 	}
 
 	public void cleanup() {
-		File file = new File(userHome + File.separator + "qpc" + File.separator + resDir + File.separator
+		File file = new File(userHome + File.separator + Constants.APP_NAME + File.separator + resDir + File.separator
 				+ Constants.OVERDUE_SRS_FILE_NAME);
 		logger.info("Deleting file: " + (file.getAbsolutePath()));
 		if (file.exists()) {
@@ -59,7 +59,7 @@ public class OverdueSrsJob extends ApplicationJob {
 			List<SR> queueList = siebelReportDownloader.getOverdueSrs(Constants.OVERDUE_SRS_FILE_NAME);
 			if (queueList != null && !queueList.isEmpty()) {
 				logger.info("Overdue SRs list : " + queueList.size());
-				srDetailsDownloader.getSRDetails(queueList, userHome + File.separator + "qpc" + File.separator + resDir);
+				srDetailsDownloader.getSRDetails(queueList, userHome + File.separator + Constants.APP_NAME + File.separator + resDir);
 			}
 			this.processEmailToSend(queueList);
 			logger.info("End Overdue SRS Queue");
@@ -152,13 +152,13 @@ public class OverdueSrsJob extends ApplicationJob {
 		if (srs.size() > 1) {
 			context.put("srList", srs);
 			context.put("ownerName", srs.get(0).getOwnerName());
-			template = velocityEngine.getTemplate("list-overdue-srs-by-owner.vm");
+			template = velocityEngine.getTemplate(Constants.LIST_OVERDUE_SRS_TEMPLATE);
 			subject = Settings.getString(Constants.APP_SHORT_NAME) + (" - Following The List Of OVERDUE SRs For ")
 					+ srs.get(0).getOwnerName() + " - Please Enter the Latest Statuses ";
 		} else {
 			sr = srs.get(0);
 			context.put("sr", sr);
-			template = velocityEngine.getTemplate("overdue-srs.vm");
+			template = velocityEngine.getTemplate(Constants.OVERDUE_SRS_TEMPLATE);
 			subject = Settings.getString(Constants.APP_SHORT_NAME) + (" - OVERDUE SR ") + sr.getNumber() + " / "
 					+ sr.getAccount() + " / Last Update On " + sr.getLastUpdate() + " /  ";
 		}

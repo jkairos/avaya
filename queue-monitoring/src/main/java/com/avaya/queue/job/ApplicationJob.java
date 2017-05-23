@@ -1,5 +1,6 @@
 package com.avaya.queue.job;
 
+import java.io.File;
 import java.util.List;
 
 import org.apache.velocity.VelocityContext;
@@ -34,7 +35,8 @@ public abstract class ApplicationJob extends QuartzJobBean{
 		if(velocityEngine==null){
 			velocityEngine = new VelocityEngine();
 			velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "file");
-			velocityEngine.setProperty("file.resource.loader.path",Constants.APP_PATH + "templates" + "," + Constants.PROJECT_PATH + "templates");
+			velocityEngine.setProperty("file.resource.loader.path",userHome+File.separator+Constants.APP_NAME+File.separator+"templates"+
+					","+Constants.APP_PATH + "templates" + "," + Constants.PROJECT_PATH + "templates");
 			velocityEngine.init();
 		}
 		

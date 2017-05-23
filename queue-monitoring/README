@@ -1,4 +1,4 @@
-GENERATING QPC BINARY
+GENERATING QMA BINARY
 --> Before running configue.sh make sure the file is executable (chmod a+x configure.sh)
 --> To generate the queue monitoring application binary jar file with all dependencies run the command below:
 ./configure.sh

@@ -22,7 +22,7 @@ public class QueuePendingSrsJob extends ApplicationJob {
 	}
 	
 	public void cleanup() {
-		File file = new File(userHome+File.separator+"qpc"+File.separator+resDir+File.separator+Constants.QUEUE_PENDING_FILE_NAME);
+		File file = new File(userHome+File.separator+Constants.APP_NAME+File.separator+resDir+File.separator+Constants.QUEUE_PENDING_FILE_NAME);
 		logger.info("Deleting file: " +(file.getAbsolutePath()));
 		if (file.exists()) {
 			file.delete();
@@ -36,7 +36,7 @@ public class QueuePendingSrsJob extends ApplicationJob {
 			List<SR> queueList = siebelReportDownloader.getQueueList(Constants.QUEUE_PENDING_FILE_NAME);
 			logger.info("Current Queue Size: " + queueList.size());
 			if (queueList != null && !queueList.isEmpty()) {
-				srDetailsDownloader.getSRDetails(queueList,userHome + File.separator + "qpc" + File.separator + resDir);
+				srDetailsDownloader.getSRDetails(queueList,userHome + File.separator + Constants.APP_NAME + File.separator + resDir);
 			}
 			this.processEmailToSend(queueList);
 			logger.info("End Process QueuePendingSrs");
@@ -49,9 +49,9 @@ public class QueuePendingSrsJob extends ApplicationJob {
 		Template template = null;
 
 		if (queueList != null && !queueList.isEmpty()) {
-			template = velocityEngine.getTemplate("pending-in-queue.vm");
+			template = velocityEngine.getTemplate(Constants.PENDING_IN_QUEUE_TEMPLATE);
 		} else {
-			template = velocityEngine.getTemplate("queue-empty.vm");
+			template = velocityEngine.getTemplate(Constants.QUEUE_EMPTY_TEMPLATE);
 		}
 
 		/**

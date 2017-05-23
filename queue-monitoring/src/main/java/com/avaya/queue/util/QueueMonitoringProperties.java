@@ -8,12 +8,13 @@ import java.util.Properties;
 
 public class QueueMonitoringProperties {
 	private static Properties props = new Properties();
-
+	private static String userHome = System.getProperty("user.home");
+	
 	public static String getProperty(String key) {
 		String value = null;
 
 		try {
-			props.load(new FileInputStream(Constants.APP_PATH+File.separator+"config.properties"));
+			props.load(new FileInputStream(userHome+File.separator+Constants.APP_NAME+File.separator+"config"+File.separator+"config.properties"));
 		} catch (FileNotFoundException e) {
 			try {
 				props.load(QueueMonitoringProperties.class.getClassLoader().getSystemResourceAsStream("config.properties"));

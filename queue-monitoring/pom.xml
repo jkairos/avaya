@@ -139,7 +139,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>qpc</finalName>
+		<finalName>qma</finalName>
 		<plugins>
 			<!-- download source code in Eclipse, best practice -->
 			<plugin>

@@ -5,7 +5,7 @@
   <artifactId>queue-monitoring</artifactId>
   <version>1.0.0</version>
   <build>
-    <finalName>qpc</finalName>
+    <finalName>qma</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-eclipse-plugin</artifactId>

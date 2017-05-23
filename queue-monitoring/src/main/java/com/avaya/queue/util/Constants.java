@@ -3,6 +3,7 @@ package com.avaya.queue.util;
 import java.io.File;
 
 public class Constants {
+	public static final String APP_NAME="qma";
 	private static File JAR_PATH = new File(Constants.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 	public static final String APP_PATH = JAR_PATH.getParentFile().getAbsolutePath()+File.separator;
 	public static final String PROJECT_PATH=(Constants.class.getProtectionDomain().getCodeSource().getLocation()).getFile()+File.separator;
@@ -12,6 +13,8 @@ public class Constants {
 	public static final String SR_DETAILS_URL="sr.details.url";
 
 	public static final String CONTRACTS_XLSB=APP_PATH+"contracts"+File.separator+"contracts.xlsb";
+	public static final String CONTRACTS_XLSX="contracts"+File.separator+"contracts.xlsx";
+	public static final String MANUAL_CONTRACTS_XLSX="contracts"+File.separator+"manual-contracts.xlsx";
 	public static final String QUEUE_FILE_PATH=APP_PATH+"res_queue"+File.separator;
 	public static final String QUEUE_FILE_NAME="queue.html";
 	public static final String OVERDUE_SRS_FILE_NAME="overdueSRs.html";
@@ -36,9 +39,7 @@ public class Constants {
 	public static final String ID_TYPE="lType";
 	public static final String ID_SECURITY_RESTRICTED="lSecurityRestricted";
 	public static final String ID_USERNAME="hlName";
-	public static final String CONTRACTS_XLSX=APP_PATH+"contracts"+File.separator+"contracts.xlsx";
-	public static final String MANUAL_CONTRACTS_XLSX=APP_PATH+"contracts"+File.separator+"manual-contracts.xlsx";
-	public static final String INSERT_DATA_FILE=APP_PATH+"db"+File.separator+"insert-data.sql";
+	public static final String INSERT_DATA_FILE="db"+File.separator+"insert-data.sql";
 	public static final String SBI_INTERVAL="interval.to.resend.email.sbi";
 	public static final String BI_INTERVAL="interval.to.resend.email.bi";
 	public static final String NSI_INTERVAL="interval.to.resend.email.nsi";
@@ -55,6 +56,14 @@ public class Constants {
 	public static final String MANAGERS_EMAILS="managers.emails";
 	public static final String USER_DETAILS="user.handle.details";
 	public static final String SIEBEL_EMAIL_ADDRESS="siebel.email.address";
+	public static final String CUSTOMER_CONTRACTS_TEMPLATE="customer-contracts.vm";
+	public static final String LIST_OVERDUE_SRS_TEMPLATE="list-overdue-srs-by-owner.vm";
+	public static final String NO_CONTRACTS_TEMPLATE="no-contracts-found.vm";
+	public static final String OVERDUE_SRS_TEMPLATE="overdue-srs.vm";
+	public static final String PENDING_IN_QUEUE_TEMPLATE="pending-in-queue.vm";
+	public static final String QUEUE_EMPTY_TEMPLATE="queue-empty.vm";
+	public static final String SR_SENT_BACK_TO_QUEUE_TEMPLATE="sr-sent-back-to-queue.vm";
+
 	public static final String CSS="body { "
 +"	color: #ffffff; "
 +"	margin: 0; "

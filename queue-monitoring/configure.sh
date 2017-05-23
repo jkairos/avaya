@@ -1,38 +1,42 @@
-#!/bin/ksh
+#! /bin/bash
 #
 #
-
 echo "Generating Queue Monitoring Jar File With All The Dependencies"
 mvn package
 
-echo "Creating Application Folder at $HOME/qpc"
-rm -Rf $HOME/qpc
-mkdir $HOME/qpc
+export QMA_HOME=${HOME}/qma
+echo "Creating Application Folder at ${QMA_HOME}"
+rm -Rf ${QMA_HOME}
+mkdir ${QMA_HOME}
 
 echo "Setting Up Application"
-mkdir $HOME/qpc/contracts
-mkdir $HOME/qpc/res_queue
-mkdir $HOME/qpc/res_overdue
-mkdir $HOME/qpc/res_pending
-mkdir $HOME/qpc/db
-mkdir $HOME/qpc/templates
-mkdir $HOME/qpc/logs
+mkdir ${QMA_HOME}/bin
+mkdir ${QMA_HOME}/config
+mkdir ${QMA_HOME}/contracts
+mkdir ${QMA_HOME}/res_queue
+mkdir ${QMA_HOME}/res_overdue
+mkdir ${QMA_HOME}/res_pending
+mkdir ${QMA_HOME}/db
+mkdir ${QMA_HOME}/templates
+mkdir ${QMA_HOME}/logs
 
-cp -fr target/classes/contracts/*.* $HOME/qpc/contracts
-cp -fr target/classes/templates/*.* $HOME/qpc/templates
-cp -fr target/classes/db/*.sql $HOME/qpc/db
-cp -fr target/classes/*.xml $HOME/qpc
-cp -fr target/classes/config/prod/*.xml $HOME/qpc
-cp -fr target/classes/config/prod/*.properties $HOME/qpc
-cp -fr target/qpc.jar $HOME/qpc
-cp -fr queue-monitoring.sh $HOME/qpc
-chmod a+x $HOME/qpc/queue-monitoring.sh
-zip -d $HOME/qpc/qpc.jar applicationContext.xml
-#zip -d $HOME/qpc/qpc.jar config.properties
-zip -d $HOME/qpc/qpc.jar config/*
-zip -d $HOME/qpc/qpc.jar contracts/*
-zip -d $HOME/qpc/qpc.jar res/*
-zip -d $HOME/qpc/qpc.jar db/*
-zip -d $HOME/qpc/qpc.jar templates/*
+cp -fr target/classes/contracts/*.* ${QMA_HOME}/contracts
+cp -fr target/classes/templates/*.* ${QMA_HOME}/templates
+cp -fr target/classes/db/*.sql ${QMA_HOME}/db
+cp -fr target/classes/*.xml ${QMA_HOME}/config
+cp -fr target/classes/config/prod/*.xml ${QMA_HOME}/config
+cp -fr target/classes/config/prod/*.properties ${QMA_HOME}/config
+cp -fr target/qma.jar ${QMA_HOME}/bin
+cp -fr queue-monitoring.sh ${QMA_HOME}/bin
+chmod a+x ${QMA_HOME}/bin/queue-monitoring.sh
 
-echo "Setup Completed Successfully!!! Please Go To $HOME/qpc and RUN ./queue-monitoring.sh to Start the Queue Monitoring Application"
+echo "Deleting properties and XML files inside ${QMA_HOME}/bin/qma.jar file"
+zip -d ${QMA_HOME}/bin/qma.jar applicationContext.xml
+#zip -d ${QMA_HOME}/bin/qma.jar config.properties
+zip -d ${QMA_HOME}/bin/qma.jar config/*
+zip -d ${QMA_HOME}/bin/qma.jar contracts/*
+zip -d ${QMA_HOME}/bin/qma.jar res/*
+zip -d ${QMA_HOME}/bin/qma.jar db/*
+zip -d ${QMA_HOME}/bin/qma.jar templates/*
+
+echo "Setup Completed Successfully!!! Please Go To ${QMA_HOME}/bin and RUN ./queue-monitoring.sh start to Start the Queue Monitoring Application"

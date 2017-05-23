@@ -113,7 +113,7 @@ public class QueueService {
 			context.put("caseEntries", sr.getCaseEntries());
 
 			if (sr.isSentBackToQueueByAccountTeam()) {
-				template = velocityEngine.getTemplate("sr-sent-back-to-queue.vm");
+				template = velocityEngine.getTemplate(Constants.SR_SENT_BACK_TO_QUEUE_TEMPLATE);
 				if (sr.getCustomerContracts() != null && !sr.getCustomerContracts().isEmpty()) {
 					contractFound = true;
 				}
@@ -123,13 +123,13 @@ public class QueueService {
 						+ sr.getAccount() + " / " + sr.getProductEntitled() + " / " + sr.getDescription();
 			} else {
 				if (!sr.getCustomerContracts().isEmpty()) {
-					template = velocityEngine.getTemplate("customer-contracts.vm");
+					template = velocityEngine.getTemplate(Constants.CUSTOMER_CONTRACTS_TEMPLATE);
 					contractFound = true;
 				} else if (sr.getCustomerContracts().isEmpty()) {
-					template = velocityEngine.getTemplate("no-contracts-found.vm");
+					template = velocityEngine.getTemplate(Constants.NO_CONTRACTS_TEMPLATE);
 					contractFound = false;
 				} else {
-					template = velocityEngine.getTemplate("queue-empty.vm");
+					template = velocityEngine.getTemplate(Constants.QUEUE_EMPTY_TEMPLATE);
 				}
 				subject = Settings.getString(Constants.APP_SHORT_NAME)
 						+ (sr.getType().equalsIgnoreCase("Collaboration") ? " - COLLABORATION - " : " - ")

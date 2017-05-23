@@ -22,7 +22,7 @@ public class QueueJob extends ApplicationJob {
 	}
 
 	public void cleanup() {
-		File file = new File(userHome + File.separator + "qpc" + File.separator + resDir + File.separator
+		File file = new File(userHome + File.separator + Constants.APP_NAME + File.separator + resDir + File.separator
 				+ Constants.QUEUE_FILE_NAME);
 		logger.info("Deleting file: " + (file.getAbsolutePath()));
 		if (file.exists()) {
@@ -40,7 +40,7 @@ public class QueueJob extends ApplicationJob {
 
 			if (queueList != null && !queueList.isEmpty()) {
 				srDetailsDownloader.getSRDetails(queueList,
-						userHome + File.separator + "qpc" + File.separator + resDir);
+						userHome + File.separator + Constants.APP_NAME + File.separator + resDir);
 				this.processEmailToSend(queueList);
 			}
 			logger.info("End Process Queue");

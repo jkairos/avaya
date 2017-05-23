@@ -60,8 +60,8 @@
 	
 	<!-- jdbc:hsqldb:mem:dataSource -->
 	<jdbc:embedded-database id="dataSource" type="HSQL">
-		<jdbc:script location="file:///#{systemProperties['user.home']}/qpc/db/create-db.sql" />
-		<jdbc:script location="file:///#{systemProperties['user.home']}/qpc/db/insert-data.sql" />
+		<jdbc:script location="file:///#{systemProperties['user.home']}/qma/db/create-db.sql" />
+		<jdbc:script location="file:///#{systemProperties['user.home']}/qma/db/insert-data.sql" />
 	</jdbc:embedded-database>
 
 	<bean id="jdbcTemplate"

@@ -35,9 +35,10 @@ import com.avaya.queue.util.Constants;
  * @author jferreira
  *
  */
-public class ScriptUtil {
-	private final static Logger logger = Logger.getLogger(ScriptUtil.class);
-	private static final Map<String, String> MAP_MONTHS; 
+public class ScriptDBBuilder {
+	private final static Logger logger = Logger.getLogger(ScriptDBBuilder.class);
+	private static final Map<String, String> MAP_MONTHS;
+	private String userHome = System.getProperty("user.home");
 	
 	static{
 		MAP_MONTHS = new HashMap<String, String>();
@@ -81,7 +82,7 @@ public class ScriptUtil {
 			FileOutputStream fos = null;
 
 			try {
-				outputFile = new File(Constants.INSERT_DATA_FILE);
+				outputFile = new File(userHome+File.separator+Constants.APP_NAME+File.separator+Constants.INSERT_DATA_FILE);
 				fos = new FileOutputStream(outputFile);
 			} catch (FileNotFoundException e) {
 				outputFile = new File(Constants.PROJECT_PATH + "db" + File.separator + "insert-data.sql");
@@ -106,7 +107,7 @@ public class ScriptUtil {
 		FileInputStream file = null;
 
 		try {
-			file = new FileInputStream(new File(Constants.CONTRACTS_XLSX));
+			file = new FileInputStream(new File(userHome+File.separator+Constants.APP_NAME+File.separator+Constants.CONTRACTS_XLSX));
 		} catch (FileNotFoundException e) {
 			file = new FileInputStream(
 					new File(Constants.PROJECT_PATH + "contracts" + File.separator + "contracts.xlsx"));
@@ -325,7 +326,7 @@ public class ScriptUtil {
 		FileInputStream file = null;
 
 		try {
-			file = new FileInputStream(new File(Constants.MANUAL_CONTRACTS_XLSX));
+			file = new FileInputStream(new File(userHome+File.separator+Constants.APP_NAME+File.separator+Constants.MANUAL_CONTRACTS_XLSX));
 		} catch (FileNotFoundException e) {
 			file = new FileInputStream(
 					new File(Constants.PROJECT_PATH + "contracts" + File.separator + "manual-contracts.xlsx"));
@@ -424,43 +425,47 @@ public class ScriptUtil {
 							String month="";
 							String year = "";
 							int i = 0;
-							
-							while(!Character.isDigit(charArray[i])){
-								i++;
+							if(charArray!=null && charArray.length > 0){
+								while(!Character.isDigit(charArray[i])){
+									i++;
+								}
+								
+								int index=0;
+								
+								while(charArray[index] != ' '){
+									month+=charArray[index];
+									index++;
+								}
+								
+								month=month.trim();
+								if(MAP_MONTHS.get(month.toUpperCase()) == null){
+									System.out.println("");
+								}
+								month=MAP_MONTHS.get(month.toUpperCase());
+								
+								while(Character.isDigit(charArray[i])){
+									day+=charArray[i];
+									i++;
+								}
+								
+								if(day.length()<2){
+									day="0"+day;
+								}
+								
+								while(!Character.isDigit(charArray[i])){
+									i++;
+								}
+								
+								while(i < charArray.length && Character.isDigit(charArray[i])){
+									year+=charArray[i];
+									i++;
+								}
+								year=year.trim();
+								toDate=day+"/"+month+"/"+year;					
+							}else{
+								toDate=null;
 							}
-							
-							int index=0;
-							
-							while(charArray[index] != ' '){
-								month+=charArray[index];
-								index++;
-							}
-							
-							month=month.trim();
-							if(MAP_MONTHS.get(month.toUpperCase()) == null){
-								System.out.println("");
-							}
-							month=MAP_MONTHS.get(month.toUpperCase());
-							
-							while(Character.isDigit(charArray[i])){
-								day+=charArray[i];
-								i++;
-							}
-							
-							if(day.length()<2){
-								day="0"+day;
-							}
-							
-							while(!Character.isDigit(charArray[i])){
-								i++;
-							}
-							
-							while(i < charArray.length && Character.isDigit(charArray[i])){
-								year+=charArray[i];
-								i++;
-							}
-							year=year.trim();
-							toDate=day+"/"+month+"/"+year;
+			
 						}
 
 					}else if(cell.getColumnIndex() == 9){//Comments APP 

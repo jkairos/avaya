@@ -39,7 +39,7 @@ public class SiebelReportDownloader {
 
 	public List<SR> getOverdueSrs(String fileName) {
 		List<SR> queueList = new ArrayList<SR>();
-		File input = new File(userHome+File.separator+"qpc"+File.separator+resPath+File.separator + fileName);
+		File input = new File(userHome+File.separator+Constants.APP_NAME+File.separator+resPath+File.separator + fileName);
 		SR sr = null;
 		try {
 			Document doc = null;
@@ -109,7 +109,7 @@ public class SiebelReportDownloader {
 	}
 
 	private List<SR> getQueueList(String spanId, List<SR> queueList, String fileName) {
-		File input = new File(userHome+File.separator+"qpc"+File.separator+resPath+File.separator + fileName);
+		File input = new File(userHome+File.separator+Constants.APP_NAME+File.separator+resPath+File.separator + fileName);
 		SR sr = null;
 		try {
 			Document doc = null;
@@ -226,7 +226,7 @@ public class SiebelReportDownloader {
 
 			try {
 				// save to this filename
-				file = new File(userHome+File.separator+"qpc"+File.separator+resPath+File.separator + fileName);
+				file = new File(userHome+File.separator+Constants.APP_NAME+File.separator+resPath+File.separator + fileName);
 
 				if (!file.exists()) {
 					file.createNewFile();
