@@ -168,14 +168,15 @@ public class OverdueSrsJob extends ApplicationJob {
 		template.merge(context, swOut);
 		String message = swOut.toString();
 		String ownerEmailAddress = sr == null ? srs.get(0).getOwner() : sr.getOwner();
-		ownerEmailAddress = ownerEmailAddress + "@avaya.com";
-		ownerEmailAddress += "," + Settings.getString(Constants.ARCHITECTS_EMAILS) + ","
-				+ Settings.getString(Constants.MANAGERS_EMAILS);
-		logger.info("ownerEmailAdrress: " + ownerEmailAddress);
-		AsyncEmailer.getInstance(Settings.getString("email.from.address"), ownerEmailAddress, subject, message).start();
-		// AsyncEmailer.getInstance(Settings.getString("email.from.address"),
-		// "jferreira@avaya.com", subject, message)
-		// .start();
+		
+		//Sometimes the list of SRs that is in overdue still with the ADV_APP_SUPPORT user, so we need to skip it.
+		if(!ownerEmailAddress.equalsIgnoreCase(Settings.getString(Constants.QUEUE_OWNER))){
+			ownerEmailAddress = ownerEmailAddress + "@avaya.com";
+			ownerEmailAddress += "," + Settings.getString(Constants.ARCHITECTS_EMAILS) + ","
+					+ Settings.getString(Constants.MANAGERS_EMAILS);
+			logger.info("ownerEmailAdrress: " + ownerEmailAddress);
+			AsyncEmailer.getInstance(Settings.getString("email.from.address"), ownerEmailAddress, subject, message).start();
+		}
 	}
 
 }
