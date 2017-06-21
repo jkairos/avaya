@@ -51,7 +51,7 @@ public class OverdueSrsJob extends ApplicationJob {
 		}
 	}
 
-	public void processQueue() {
+	public void processJob() {
 		try{
 			logger.info("Overdue SRS Queue");
 			siebelReportDownloader.readUrl();

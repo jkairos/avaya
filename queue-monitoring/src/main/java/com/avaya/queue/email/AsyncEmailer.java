@@ -7,12 +7,16 @@ import java.net.URLConnection;
 import java.security.Security;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -46,7 +50,8 @@ public class AsyncEmailer extends Thread {
 	private String html;
 	private String text;
 	private List<Attachment> attachments = new LinkedList<Attachment>();
-
+	private Map<String,DataHandler> images = new HashMap<String,DataHandler>();
+	
 	public String getSubject() {
 		return subject;
 	}
@@ -192,6 +197,11 @@ public class AsyncEmailer extends Thread {
 		attachments.add(new Attachment(url));
 	}
 
+	public void addImage(String key, String imagePath){
+		DataSource fds = new FileDataSource(imagePath);
+		images.put(key, new DataHandler(fds));
+	}
+	
 	static {
 		log.debug("setting up security provider");
 		Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
@@ -330,6 +340,8 @@ public class AsyncEmailer extends Thread {
 			message.setSubject(MimeUtility.encodeText(subject, "UTF-8", null));
 
 			List<MimeBodyPart> attachmentParts = new LinkedList<MimeBodyPart>();
+			
+			//Add Attachments
 			for (Attachment attachment : attachments) {
 				if (attachment.data == null && attachment.url != null) {
 					try {
@@ -339,6 +351,7 @@ public class AsyncEmailer extends Thread {
 						continue;
 					}
 				}
+				
 				MimeBodyPart attachmentBodyPart = new MimeBodyPart();
 				ByteArrayDataSource dataSource = new ByteArrayDataSource(attachment.data, attachment.mime);
 				attachmentBodyPart.setDataHandler(new DataHandler(dataSource));
@@ -346,7 +359,18 @@ public class AsyncEmailer extends Thread {
 					attachmentBodyPart.setFileName(attachment.filename);
 				attachmentParts.add(attachmentBodyPart);
 			}
-
+			
+			//Add Images
+			List<MimeBodyPart> imageParts = new LinkedList<MimeBodyPart>();
+			for (Map.Entry<String, DataHandler> entry : images.entrySet()) {
+				MimeBodyPart imagePart = new MimeBodyPart();
+				imagePart.setDataHandler(entry.getValue());
+				// assign a cid to the image
+				imagePart.setHeader("Content-ID", entry.getKey());
+				imageParts.add(imagePart);
+			}
+			
+			
 			if (attachmentParts.size() == 0 && html == null) {
 				message.setContent(text, "text/plain; charset=UTF-8");
 			} else {
@@ -358,18 +382,23 @@ public class AsyncEmailer extends Thread {
 				MimeBodyPart htmlPart = new MimeBodyPart();
 				htmlPart.setContent(html, "text/html; charset=UTF-8");
 				alternative.addBodyPart(htmlPart);
-				if (attachmentParts.size() == 0) {
-					message.setContent(alternative);
-				} else {
+				
+				if(imageParts.size()!=0 || attachmentParts.size() != 0){
 					MimeMultipart mixed = new MimeMultipart("mixed");
 					message.setContent(mixed);
 					MimeBodyPart wrap = new MimeBodyPart();
 					wrap.setContent(alternative);
 					mixed.addBodyPart(wrap);
+					for (MimeBodyPart imagePart : imageParts) {
+						mixed.addBodyPart(imagePart);
+					}				
 					for (MimeBodyPart attachmentPart : attachmentParts) {
 						mixed.addBodyPart(attachmentPart);
 					}
+				}else{
+					message.setContent(alternative);
 				}
+				
 			}
 
 			message.setSentDate(new Date());

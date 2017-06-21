@@ -28,7 +28,7 @@ public class QueuePendingSrsJob extends ApplicationJob {
 			file.delete();
 		}
 	}	
-	public void processQueue() {
+	public void processJob() {
 		logger.info("Begin Process QueuePendingSrs");
 		try{
 			siebelReportDownloader.readUrl();

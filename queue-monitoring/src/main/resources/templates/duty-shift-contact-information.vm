@@ -1,0 +1,157 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			$css
+		</style>
+	</head>
+	<body>
+		<font color="black">
+	     <p>Dear <b>$!dutyShift.westEngineer.name/ $!dutyShift.eastEngineer.name/ $!dutyShift.backupSeniorEngineer.name, </b> </p>
+	     <p>You will be <b>ON DUTY</b> this weekend (<font color="#0000ff"><u>$!dutyShift.coverageWeek</u></font>), below are the phone numbers in case you need to contact anyone: <p>
+		<table class="employeeMessageContainer">
+			<tr>
+	         <td class="fullNoBorderContainer" colspan="2">
+	         	<b>Application Support Engineers On Duty</b>
+	         </td>
+	        </tr>
+	     </table>		
+		<table class="tableBorder" width="100%" cellspacing="0">
+			<tr class="headRowV3">
+			    <th>Name</th>
+			    <th>Handle</th>
+			    <th>Voice</th>
+			    <th>US Extension</th>
+			    <th>Cell Phone</th>
+			    <th>Country</th>
+			    <th>Duty Engineer</th>
+			</tr>
+		    <tr>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.westEngineer.name</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.westEngineer.handle</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.westEngineer.voice</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.westEngineer.usExtension</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.westEngineer.cellPhone</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.westEngineer.country</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6"><b>Primary (West)</b></td>
+		    </tr>
+		    <tr>
+		        <td class="blacktext" style="text-align:left;background-color:#F2F2F2">$!dutyShift.eastEngineer.name</td>
+		        <td class="blacktext" style="text-align:left;background-color:#F2F2F2">$!dutyShift.eastEngineer.handle</td>
+		        <td class="blacktext" style="text-align:left;background-color:#F2F2F2">$!dutyShift.eastEngineer.voice</td>
+		        <td class="blacktext" style="text-align:left;background-color:#F2F2F2">$!dutyShift.eastEngineer.usExtension</td>
+		        <td class="blacktext" style="text-align:left;background-color:#F2F2F2">$!dutyShift.eastEngineer.cellPhone</td>
+		        <td class="blacktext" style="text-align:left;background-color:#F2F2F2">$!dutyShift.eastEngineer.country</td>
+		        <td class="blacktext" style="text-align:left;background-color:#F2F2F2"><b>Primary (East)</b></td>
+		    </tr>
+		    <tr>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.backupSeniorEngineer.name</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.backupSeniorEngineer.handle</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.backupSeniorEngineer.voice</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.backupSeniorEngineer.usExtension</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.backupSeniorEngineer.cellPhone</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.backupSeniorEngineer.country</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6"><b>Backup</b></td>
+		    </tr>
+		</table>
+		<br>
+		<table class="employeeMessageContainer">
+			<tr>
+	         <td class="fullNoBorderContainer" colspan="2">
+	         	<b>Manager's Contact Information</b>
+	         </td>
+	        </tr>
+	     </table>		
+		<table class="tableBorder" width="100%" cellspacing="0">
+			<tr class="headRowV3">
+			    <th>Name</th>
+			    <th>Handle</th>
+			    <th>Voice</th>
+			    <th>US Extension</th>
+			    <th>Cell Phone</th>
+			    <th>Country</th>
+			</tr>
+			#foreach ($manager in $!managers)
+			    <tr>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!manager.name</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!manager.handle</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!manager.voice</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!manager.usExtension</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!manager.cellPhone</td>
+			        <td class="blacktext" style="text-align:left;#if($velocityCount%2!=0) background-color:#E6E6E6 #else background-color:#F2F2F2 #end">$!manager.country</td>
+			    </tr>
+			#end
+		</table>
+		<br>			
+		  <table class="employeeMessageContainer">
+			<tr>
+	         <td class="fullNoBorderContainer" colspan="2">
+	         	<b>Working Hours </b>
+	         </td>
+	        </tr>
+	      </table>	
+		<table class="tableBorder" width="100%" cellspacing="0">
+			<tr class="headRowV3">
+				<th>Hours</th>
+			    <th>Friday</th>
+			    <th>Saturday</th>
+			    <th>Sunday (**Duty Shift ends 7:00PM)</th>
+			</tr>
+		    <tr>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6"><b>00:00 AM EDT - 10:00 AM EDT</b></td>
+		        <td class="blacktext" style="text-align:center;background-color:#E6E6E6"><b>X</b></td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.eastEngineer.name/ $!dutyShift.backupSeniorEngineer.name</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.eastEngineer.name/ $!dutyShift.backupSeniorEngineer.name</td>
+		    </tr>
+		    <tr>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6"><b>10:00 AM EDT - 8:00 PM EDT</b></td>
+		        <td class="blacktext" style="text-align:center;background-color:#E6E6E6"><b>X</b></td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.westEngineer.name/ $!dutyShift.backupSeniorEngineer.name</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.westEngineer.name/ $!dutyShift.backupSeniorEngineer.name</td>
+		    </tr>
+		    <tr>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6"><b>8:00 PM EDT - 10:00 PM EDT</b></td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.westEngineer.name/ $!dutyShift.backupSeniorEngineer.name</td>
+		        <td class="blacktext" style="text-align:left;background-color:#E6E6E6">$!dutyShift.westEngineer.name/ $!dutyShift.backupSeniorEngineer.name</td>
+		        <td class="blacktext" style="text-align:center;background-color:#E6E6E6"><b>X</b></td>
+		    </tr>
+		    <tr>
+		        <td class="blacktext" style="text-align:left;background-color:#F2F2F2"><b>10:00 PM EDT - 11:59 PM ED</b></td>
+		        <td class="blacktext" style="text-align:left;background-color:#F2F2F2">$!dutyShift.eastEngineer.name/ $!dutyShift.backupSeniorEngineer.name</td>
+		        <td class="blacktext" style="text-align:left;background-color:#F2F2F2">$!dutyShift.eastEngineer.name/ $!dutyShift.backupSeniorEngineer.name</td>
+		        <td class="blacktext" style="text-align:center;background-color:#F2F2F2"><b>X</b></td>
+		    </tr>
+		</table>
+		<br>
+		<table class="employeeMessageContainer">
+			<tr>
+	         <td class="fullNoBorderContainer" colspan="2">
+	         	Please make sure that you are familiar with the work flow below:</p>
+	         </td>
+	        </tr>
+	     </table>
+		<img src="cid:$!dutyProcessKey">
+		<font color="black">
+			<b>Process Description in Details:</b>
+			<p><b>(1)</b> Call Primary Duty Engineer <b>($!dutyShift.westEngineer.name/ $!dutyShift.eastEngineer.name/)</b>. Call on <b><u>cell phone</u></b>. Leave a message if you are not answered.</p>
+			<p><b>(2)</b> If after <b>15 minutes</b> the engineer does not answer back, <b>call again</b>. Call on <b><u>cell phone</u></b>. Leave a message if you are not answered.</p>
+			<p><b>(3)</b> If the primary engineer <b>does not answer</b> the second call, please call the Backup Senior Duty Engineer <b>($!dutyShift.backupSeniorEngineer.name)</b>.</p>
+			<p><b>(4)</b> Call Backup Duty Engineer <b>($!dutyShift.backupSeniorEngineer.name - according to the Out of Hours Coverage table)</b>. Call on <b><u>cell phone</u></b>. Leave a message if you are not answered.</p>
+			<p><b>(5)</b> If after <b>10 minutes</b> both of them do not answer back, <b><u>call both again</u></b>. Call on <b><u>cell phone</u></b>. Leave a message if you are not answered.</p>
+			<p><b>(6)</b> If after <b>10 minutes</b> both of them have not answered, call <b>Ankita Kapil Vinod</b> on her cell phone <u>(from 10:00 PM EST till 10:00 AM EST)</u> or <b>Fernanda Martinez</b> on her cell phone <u>(from 10:00 AM EST till 10:00 PM EST)</u>. Leave a message if you are not answered.</p>
+			<p><b>(7)</b> If after <b>15 minutes</b> <b>Ankita Kapil</b> or <b>Fernanda Martinez</b> has not answered, <b><u>call again</u></b>.</p>
+			<p><b>(8)</b> If after <b>15 minutes</b> you have no response, call <b>Andre Giansanti</b> on his cell phone.</p>
+			<p><b>(9)</b> If after <b>15 minutes</b> you have no response, call <b>Marcos Fujisawa</b> on his cell phone.</p>
+		</font>
+		<br>	
+   		<table class="employeeMessageContainer">
+   			<tr>
+         		<td class="empSubLabelContainer">
+         			<span class="legalFooter">
+						<font color="#ff0000">CONFIDENTIALITY NOTICE:</font><br>This notification message is for the sole use of the intended recipient(s) and contains confidential and proprietary company information.  Any unauthorized review, use, disclosure or distribution especially  to Customers or Business Partners is strictly prohibited<font color="#0000ff"> and is a Code of Conduct violation</font>.
+				    </span>
+         		</td>
+      		</tr>
+   		</table>
+	</body>
+</html>

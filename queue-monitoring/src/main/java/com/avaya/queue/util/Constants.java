@@ -58,12 +58,14 @@ public class Constants {
 	public static final String SIEBEL_EMAIL_ADDRESS="siebel.email.address";
 	public static final String CUSTOMER_CONTRACTS_TEMPLATE="customer-contracts.vm";
 	public static final String LIST_OVERDUE_SRS_TEMPLATE="list-overdue-srs-by-owner.vm";
+	public static final String DUTY_SHIFT_CONTRACT_INFORMATION="duty-shift-contact-information.vm";
 	public static final String NO_CONTRACTS_TEMPLATE="no-contracts-found.vm";
 	public static final String OVERDUE_SRS_TEMPLATE="overdue-srs.vm";
 	public static final String PENDING_IN_QUEUE_TEMPLATE="pending-in-queue.vm";
 	public static final String QUEUE_EMPTY_TEMPLATE="queue-empty.vm";
 	public static final String SR_SENT_BACK_TO_QUEUE_TEMPLATE="sr-sent-back-to-queue.vm";
-
+	public static final String DUTY_SHIFT_URL="dutyShift.url";
+	
 	public static final String CSS="body { "
 +"	color: #ffffff; "
 +"	margin: 0; "

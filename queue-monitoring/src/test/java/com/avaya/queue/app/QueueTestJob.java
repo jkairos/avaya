@@ -46,7 +46,7 @@ public class QueueTestJob extends ApplicationJob {
 		}
 	}
 
-	public void processQueue() {
+	public void processJob() {
 		try {
 			DatabaseManagerSwing.main(new String[]{"--url","jdbc:hsqldb:mem:dataSource","--user","sa","--password",""});
 			logger.info("Begin Process Queue");

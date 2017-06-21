@@ -1,7 +1,6 @@
 package com.avaya.queue.job;
 
 import java.io.File;
-import java.util.List;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -10,7 +9,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.avaya.queue.entity.SR;
 import com.avaya.queue.util.Constants;
 import com.avaya.queue.util.SRDetailsDownloader;
 import com.avaya.queue.util.SiebelReportDownloader;
@@ -25,7 +23,7 @@ public abstract class ApplicationJob extends QuartzJobBean{
 	protected void executeInternal(JobExecutionContext jobContext) throws JobExecutionException {
 		this.cleanup();
 		this.setupVelocityEngine();
-		this.processQueue();
+		this.processJob();
 	}
 
 	private void setupVelocityEngine(){
@@ -49,6 +47,5 @@ public abstract class ApplicationJob extends QuartzJobBean{
 	}
 	
 	public abstract void cleanup();
-	public abstract void processQueue();
-	public abstract void processEmailToSend(List<SR> queueList);
+	public abstract void processJob();
 }

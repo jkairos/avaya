@@ -30,7 +30,7 @@ public class QueueJob extends ApplicationJob {
 		}
 	}
 
-	public void processQueue() {
+	public void processJob() {
 		try {
 			logger.info("Begin Process Queue");
 			siebelReportDownloader.readUrl();

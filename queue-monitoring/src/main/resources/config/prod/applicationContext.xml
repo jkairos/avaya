@@ -92,6 +92,11 @@
 		<property name="durability" value="true" />
 	</bean>
 	
+	<bean name="dutyShiftJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.avaya.queue.job.DutyShiftJob" />
+		<property name="durability" value="true" />
+	</bean>
+
 	<!-- 
 	Name	       Required	      Allowed Values	     Allowed Special Characters
      Seconds	      Y	               0-59	                   , - * /
@@ -126,6 +131,13 @@
 		<property name="cronExpression" value="0 0 0 ? * 1-5" />
 	</bean>
 	
+	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
+	<!-- Fires Every Day at 00:00 -->
+	<bean id="cronTriggerDutyShiftJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="dutyShiftJob" />
+		<property name="cronExpression" value="0 0 9 ? * MON,FRI" />
+	</bean>
+
 	<!-- Scheduler factory bean to glue together jobDetails and triggers to Configure Quartz Scheduler -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
@@ -133,6 +145,7 @@
 				<ref bean="queueJob" />
 				<ref bean="queuePendingSrsJob" />
 				<ref bean="overdueSrsJob" />
+				<ref bean="dutyShiftJob" />
 			</list>
 		</property>
 
@@ -142,6 +155,7 @@
 				<ref bean="cronTriggerQueueJobWeekend" />
 				<ref bean="cronTriggerQueuePendingSrsJobWeekDays" />
 				<ref bean="cronTriggerOverdueSrsJob" />
+				<ref bean="cronTriggerDutyShiftJob" />
 			</list>
 		</property>
 	</bean>

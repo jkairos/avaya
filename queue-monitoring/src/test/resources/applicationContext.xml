@@ -44,9 +44,9 @@
 
 	<int:logging-channel-adapter id="logger" level="DEBUG" />
 
-	<int:service-activator input-channel="receiveEmailChannel" ref="emailReceiverService" method="receive" /> -->
+	<int:service-activator input-channel="receiveEmailChannel" ref="emailReceiverService" method="receive" />
 
-	<bean id="emailReceiverService" class="com.avaya.queue.email.EmailReceiverService" />
+	<bean id="emailReceiverService" class="com.avaya.queue.email.EmailReceiverService" /> -->
 	
 	<bean id="queueService" class="com.avaya.queue.job.QueueService" />
 
@@ -58,10 +58,11 @@
 		<property name="namedParameterJdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 	
-	<jdbc:embedded-database id="dataSource" type="HSQL"> 
-		<jdbc:script location="classpath:/db/create-db.sql" />
-		<jdbc:script location="classpath:/db/insert-data.sql" />
-	</jdbc:embedded-database> 
+	<!-- jdbc:hsqldb:mem:dataSource -->
+	<jdbc:embedded-database id="dataSource" type="HSQL">
+		<jdbc:script location="file:///#{systemProperties['user.home']}/qma/db/create-db.sql" />
+		<jdbc:script location="file:///#{systemProperties['user.home']}/qma/db/insert-data.sql" />
+	</jdbc:embedded-database>
 
 	<bean id="jdbcTemplate"
 		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
@@ -77,7 +78,7 @@
 	</bean>
 	
 	<bean name="queueJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.avaya.queue.app.QueueTestJob" />
+		<property name="jobClass" value="com.avaya.queue.job.QueueJob" />
 		<property name="durability" value="true" />
 	</bean>
 
@@ -91,6 +92,11 @@
 		<property name="durability" value="true" />
 	</bean>
 	
+	<bean name="dutyShiftJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.avaya.queue.job.DutyShiftJob" />
+		<property name="durability" value="true" />
+	</bean>
+
 	<!-- 
 	Name	       Required	      Allowed Values	     Allowed Special Characters
      Seconds	      Y	               0-59	                   , - * /
@@ -104,45 +110,52 @@
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
 	<bean id="cronTriggerQueueJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueJob" />
-		<property name="cronExpression" value="0 02 18 ? * 1-5" />
+		<property name="cronExpression" value="0/60 0/1 * ? * 1-5" />
 	</bean>
 
 	<bean id="cronTriggerQueueJobWeekend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueJob" />
-		<property name="cronExpression" value="0/500 0/1 * ? * 6-7" />
+		<property name="cronExpression" value="0/180 0/1 * ? * 6-7" />
 	</bean>
 
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
 	<bean id="cronTriggerQueuePendingSrsJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queuePendingSrsJob" />
-		<!--<property name="cronExpression" value="0 0 0/2 ? * 1-5" />-->
-		<property name="cronExpression" value="0/60 0/1 * ? * 1-5" />
+		<property name="cronExpression" value="0 0 0/2 ? * MON-FRI" />
 	</bean>
 
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
 	<!-- Fires Every Day at 00:00 -->
 	<bean id="cronTriggerOverdueSrsJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="overdueSrsJob" />
-		<property name="cronExpression" value="0 55 15 ? * 1-5" />
+		<property name="cronExpression" value="0 0 0 ? * 1-5" />
+	</bean>
+	
+	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
+	<!-- Fires Every Day at 00:00 -->
+	<bean id="cronTriggerDutyShiftJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="dutyShiftJob" />
+		<property name="cronExpression" value="0/300 0/1 * ? * WED,FRI" />
 	</bean>
 
-	<!-- Scheduler factory bean to glue together jobDetails and triggers to 
-		Configure Quartz Scheduler -->
+	<!-- Scheduler factory bean to glue together jobDetails and triggers to Configure Quartz Scheduler -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
 			<list>
-				<ref bean="queueJob" />
+				<!-- <ref bean="queueJob" />
 				<ref bean="queuePendingSrsJob" />
-				<ref bean="overdueSrsJob" />
+				<ref bean="overdueSrsJob" /> -->
+				<ref bean="dutyShiftJob" />
 			</list>
 		</property>
 
 		<property name="triggers">
 			<list>
-				<ref bean="cronTriggerQueueJobWeekDays" />
-				<!--<ref bean="cronTriggerQueueJobWeekend" />
+				<!-- <ref bean="cronTriggerQueueJobWeekDays" />
+				<ref bean="cronTriggerQueueJobWeekend" />
 				<ref bean="cronTriggerQueuePendingSrsJobWeekDays" />
 				<ref bean="cronTriggerOverdueSrsJob" /> -->
+				<ref bean="cronTriggerDutyShiftJob" />
 			</list>
 		</property>
 	</bean>
