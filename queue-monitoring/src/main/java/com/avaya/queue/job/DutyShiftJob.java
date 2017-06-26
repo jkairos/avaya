@@ -156,6 +156,7 @@ public class DutyShiftJob extends ApplicationJob {
 			String monthTableAnt = null;
 			int dutyShiftStartingDay = 0;
 			int nextFridayDay = 0;
+			LocalDate nextSunday = null;
 
 			while (i < tbRows.size()) {
 				Element row = tbRows.get(i);
@@ -176,9 +177,19 @@ public class DutyShiftJob extends ApplicationJob {
 						startDay = startDay.substring(1);
 					}
 					dutyShiftStartingDay = Integer.valueOf(startDay);
-					nextFridayDay = this.calcNextFriday(now).getDayOfMonth();
+					nextFridayDay = this.calcNextDay(now,DateTimeConstants.FRIDAY).getDayOfMonth();
+					nextSunday=this.calcNextDay(now,DateTimeConstants.SUNDAY);
 				}
-
+				
+				if(nextSunday!=null){
+					if(nextSunday.getMonthOfYear()!=now.getDayOfMonth()){
+						year = String.valueOf(nextSunday.getYear());
+						monthStr = nextSunday.monthOfYear().getAsText(); // gets the month
+																			// name
+						currentMonth = monthStr.substring(0, 3) + "-" + year.substring(2);
+					}
+				}
+				
 				if (monthTable.equalsIgnoreCase(currentMonth) && (nextFridayDay == dutyShiftStartingDay)) {
 					dutyShift.setMonth(currentMonth);
 					dutyShift.setCoverageWeek(coverageWeek);
@@ -196,12 +207,12 @@ public class DutyShiftJob extends ApplicationJob {
 		return dutyShift;
 	}
 
-	private LocalDate calcNextFriday(LocalDate d) {
-		if (d.getDayOfWeek() == DateTimeConstants.FRIDAY) {
+	private LocalDate calcNextDay(LocalDate d, int day) {
+		if (d.getDayOfWeek() == day) {
 			return d;
 		} else {
-			return d.isBefore(d.dayOfWeek().setCopy(5)) ? d.dayOfWeek().setCopy(5)
-					: d.plusWeeks(1).dayOfWeek().setCopy(5);
+			return d.isBefore(d.dayOfWeek().setCopy(day)) ? d.dayOfWeek().setCopy(day)
+					: d.plusWeeks(1).dayOfWeek().setCopy(day);
 		}
 	}
 

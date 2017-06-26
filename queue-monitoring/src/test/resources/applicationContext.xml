@@ -135,7 +135,7 @@
 	<!-- Fires Every Day at 00:00 -->
 	<bean id="cronTriggerDutyShiftJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="dutyShiftJob" />
-		<property name="cronExpression" value="0/300 0/1 * ? * WED,FRI" />
+		<property name="cronExpression" value="0/60 0/1 * ? * 1-5" />
 	</bean>
 
 	<!-- Scheduler factory bean to glue together jobDetails and triggers to Configure Quartz Scheduler -->
