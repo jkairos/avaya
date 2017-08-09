@@ -7,6 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -213,10 +216,13 @@ public class SiebelReportDownloader {
 
 		try {
 			url = new URL(urlSiebel);
+			System.setProperty("http.maxRedirects", "100");
+			//First set the default cookie manager.
+			CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
 			PKIXAuthenticator.authenticate();
 			HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-			System.setProperty("http.maxRedirects", "100");
 			conn.setReadTimeout(5000);
+			HttpsURLConnection.setFollowRedirects(true);
 
 			// open the stream and put it into BufferedReader
 			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));

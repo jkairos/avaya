@@ -13,7 +13,7 @@ import com.avaya.queue.email.Settings;
 import com.avaya.queue.entity.SR;
 import com.avaya.queue.job.ApplicationJob;
 import com.avaya.queue.job.QueueJob;
-import com.avaya.queue.job.QueueService;
+import com.avaya.queue.service.QueueService;
 import com.avaya.queue.util.Constants;
 import com.avaya.queue.util.SiebelReportDownloader;
 
@@ -83,7 +83,7 @@ public class QueueTestJob extends ApplicationJob {
 		logger.info("Begin processEmailToSend()");
 		QueueMonitoringApp.context=QueueMonitoringTestApp.context;
 		queueService=(QueueService) QueueMonitoringTestApp.context.getBean("queueService");
-		queueService.processEmailToSend(queueList, velocityEngine, context);
+		queueService.processEmailToSend(queueList, velocityEngine, context,"ADV_APP_SUPPORT");
 		logger.info("End processEmailToSend");
 	}
 

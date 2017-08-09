@@ -5,11 +5,12 @@ import java.io.File;
 public class Constants {
 	public static final String APP_NAME="qma";
 	private static File JAR_PATH = new File(Constants.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-	public static final String APP_PATH = JAR_PATH.getParentFile().getAbsolutePath()+File.separator;
+	public static final String APP_PATH = JAR_PATH.getParentFile().getAbsolutePath()+File.separator+".."+File.separator;
 	public static final String PROJECT_PATH=(Constants.class.getProtectionDomain().getCodeSource().getLocation()).getFile()+File.separator;
 	
 	public static final String URL_XLSB = "https://confluence.forge.avaya.com/download/attachments/74680487/Contracts.xlsb";
 	public static final String QUEUE_MONITORING_URL="queue.url";
+	public static final String QUEUE_MONITORING_IMP_URL="queue.imp.url";
 	public static final String SR_DETAILS_URL="sr.details.url";
 
 	public static final String CONTRACTS_XLSB=APP_PATH+"contracts"+File.separator+"contracts.xlsb";
@@ -17,8 +18,10 @@ public class Constants {
 	public static final String MANUAL_CONTRACTS_XLSX="contracts"+File.separator+"manual-contracts.xlsx";
 	public static final String QUEUE_FILE_PATH=APP_PATH+"res_queue"+File.separator;
 	public static final String QUEUE_FILE_NAME="queue.html";
+	public static final String QUEUE_IMP_FILE_NAME="queueImp.html";
 	public static final String OVERDUE_SRS_FILE_NAME="overdueSRs.html";
-	public static final String QUEUE_PENDING_FILE_NAME="queuePending.html";
+	public static final String QUEUE_PENDING_FILE_NAME="queuePendingAdvAppQueue.html";
+	public static final String IMP_QUEUE_PENDING_FILE_NAME="queuePendingAdvImpQueue.html";
 	public static final String RES=APP_PATH+"res"+File.separator;
 	public static final String ID_OPEN_SRS="lOpenSrs";
 	public static final String ID_OPEN_ACTS="lOpenActs";

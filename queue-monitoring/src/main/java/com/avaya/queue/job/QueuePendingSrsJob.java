@@ -15,11 +15,10 @@ import com.avaya.queue.util.SiebelReportDownloader;
 
 public class QueuePendingSrsJob extends ApplicationJob {
 	private final static Logger logger = Logger.getLogger(QueuePendingSrsJob.class);
-	private final static String resDir="res_pending";
+	private final static String resDir="res_pending_adv_app_support";
+	private final static String resDirAdvImp="res_pending_adv_app_imp";
 	
-	public QueuePendingSrsJob(){
-		siebelReportDownloader = new SiebelReportDownloader(Settings.getString(Constants.QUEUE_MONITORING_URL),Constants.QUEUE_PENDING_FILE_NAME,resDir);
-	}
+	public QueuePendingSrsJob(){}
 	
 	public void cleanup() {
 		File file = new File(userHome+File.separator+Constants.APP_NAME+File.separator+resDir+File.separator+Constants.QUEUE_PENDING_FILE_NAME);
@@ -27,25 +26,45 @@ public class QueuePendingSrsJob extends ApplicationJob {
 		if (file.exists()) {
 			file.delete();
 		}
+		
+		file = new File(userHome+File.separator+Constants.APP_NAME+File.separator+resDirAdvImp+File.separator+Constants.IMP_QUEUE_PENDING_FILE_NAME);
+		logger.info("Deleting file: " +(file.getAbsolutePath()));
+		if (file.exists()) {
+			file.delete();
+		}
 	}	
 	public void processJob() {
 		logger.info("Begin Process QueuePendingSrs");
+		String queueName="ADV_APP_SUPPORT";
 		try{
-			siebelReportDownloader.readUrl();
-			
-			List<SR> queueList = siebelReportDownloader.getQueueList(Constants.QUEUE_PENDING_FILE_NAME);
-			logger.info("Current Queue Size: " + queueList.size());
-			if (queueList != null && !queueList.isEmpty()) {
-				srDetailsDownloader.getSRDetails(queueList,userHome + File.separator + Constants.APP_NAME + File.separator + resDir);
-			}
-			this.processEmailToSend(queueList);
+			//ADV_APP_SUPPORT Queue
+			this.processQueue(Settings.getString(Constants.QUEUE_MONITORING_URL), Constants.QUEUE_PENDING_FILE_NAME, resDir, queueName);
+			//ADV_APP_IMP Queue
+			queueName="ADV_APP_IMP";
+			this.processQueue(Settings.getString(Constants.QUEUE_MONITORING_IMP_URL), Constants.IMP_QUEUE_PENDING_FILE_NAME, resDirAdvImp, queueName);
 			logger.info("End Process QueuePendingSrs");
 		}catch(RuntimeException re){
 			logger.error("ERROR READING PENDING SRS ",re);
 		}
 	}
-
-	public void processEmailToSend(List<SR> queueList) {
+	
+	private void processQueue(String url, String fileName, String resDir, String queueName){
+		List<SR> queueList = this.getQueueList(url, fileName, resDir);
+		logger.info("Current Queue Size: " + queueList.size());
+		if (queueList != null && !queueList.isEmpty()) {
+			srDetailsDownloader.getSRDetails(queueList,userHome + File.separator + Constants.APP_NAME + File.separator + resDir);
+		}
+		this.processEmailToSend(queueList,queueName);
+	}
+	
+	private List<SR> getQueueList(String url, String fileName, String resDir){
+		siebelReportDownloader = new SiebelReportDownloader(url,fileName,resDir);
+		siebelReportDownloader.readUrl();
+		List<SR> queueList = siebelReportDownloader.getQueueList(fileName);
+		return queueList;
+	}
+	
+	public void processEmailToSend(List<SR> queueList,String queueName) {
 		Template template = null;
 
 		if (queueList != null && !queueList.isEmpty()) {
@@ -60,7 +79,8 @@ public class QueuePendingSrsJob extends ApplicationJob {
 		if (queueList != null && !queueList.isEmpty()) {
 			context.put("pendingSRs", queueList);
 		}
-
+		context.put("queueName", queueName);
+		
 		/**
 		 * Merge data and template
 		 */
@@ -70,7 +90,7 @@ public class QueuePendingSrsJob extends ApplicationJob {
 		String message = swOut.toString();
 		String subject = null;
 		if (queueList != null) {
-			subject = Settings.getString(Constants.APP_SHORT_NAME) + " - PENDING =  " +queueList.size();
+			subject = Settings.getString(Constants.APP_SHORT_NAME) + " - PENDING =  " +queueList.size() + " IN QUEUE - " + queueName;
 		} else {
 			subject = Settings.getString(Constants.APP_SHORT_NAME) + " - Queue is Empty";
 		}

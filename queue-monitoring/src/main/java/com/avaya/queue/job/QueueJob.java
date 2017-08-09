@@ -6,24 +6,29 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.avaya.queue.app.QueueMonitoringApp;
-import com.avaya.queue.email.Settings;
 import com.avaya.queue.entity.SR;
+import com.avaya.queue.service.QueueService;
 import com.avaya.queue.util.Constants;
 import com.avaya.queue.util.SiebelReportDownloader;
 
 public class QueueJob extends ApplicationJob {
 	private final static Logger logger = Logger.getLogger(QueueJob.class);
 	private QueueService queueService;
-	private final static String resDir = "res_queue";
+	private String resDir;
+	private String queueName;
+	private String fileName;
 	
-	public QueueJob() {
-		siebelReportDownloader = new SiebelReportDownloader(Settings.getString(Constants.QUEUE_MONITORING_URL),
-				Constants.QUEUE_FILE_NAME, resDir);
+	public QueueJob(){}
+	
+	public QueueJob(String url, String queueName, String fileName,String resDir) {
+		this.queueName=queueName;
+		this.fileName=fileName;
+		this.resDir=resDir;
+		siebelReportDownloader = new SiebelReportDownloader(url,this.fileName, this.resDir);
 	}
 
 	public void cleanup() {
-		File file = new File(userHome + File.separator + Constants.APP_NAME + File.separator + resDir + File.separator
-				+ Constants.QUEUE_FILE_NAME);
+		File file = new File(userHome + File.separator + Constants.APP_NAME + File.separator + resDir + File.separator+fileName);
 		logger.info("Deleting file: " + (file.getAbsolutePath()));
 		if (file.exists()) {
 			file.delete();
@@ -32,18 +37,18 @@ public class QueueJob extends ApplicationJob {
 
 	public void processJob() {
 		try {
-			logger.info("Begin Process Queue");
+			logger.info("Begin Process Queue - " +queueName);
 			siebelReportDownloader.readUrl();
 
-			List<SR> queueList = siebelReportDownloader.getQueueList(Constants.QUEUE_FILE_NAME);
-			logger.info("Current Queue Size: " + queueList.size());
+			List<SR> queueList = siebelReportDownloader.getQueueList(fileName);
+			logger.info("Current Queue Size: " + queueList.size() +" in "+queueName);
 
 			if (queueList != null && !queueList.isEmpty()) {
 				srDetailsDownloader.getSRDetails(queueList,
 						userHome + File.separator + Constants.APP_NAME + File.separator + resDir);
 				this.processEmailToSend(queueList);
 			}
-			logger.info("End Process Queue");
+			logger.info("End Process Queue - "+queueName);
 		} catch (RuntimeException re) {
 			logger.error("ERROR PROCESSING LIST OF SRS IN QUEUE", re);
 		}
@@ -53,7 +58,7 @@ public class QueueJob extends ApplicationJob {
 	public void processEmailToSend(List<SR> queueList) {
 		logger.info("Begin processEmailToSend()");
 		queueService=(QueueService) QueueMonitoringApp.context.getBean("queueService");
-		queueService.processEmailToSend(queueList, velocityEngine, context);
+		queueService.processEmailToSend(queueList, velocityEngine, context,this.queueName);
 		logger.info("End processEmailToSend");
 	}
 

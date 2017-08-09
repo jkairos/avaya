@@ -16,7 +16,7 @@ import org.apache.velocity.runtime.RuntimeConstants;
 
 import com.avaya.queue.app.QueueMonitoringApp;
 import com.avaya.queue.entity.SR;
-import com.avaya.queue.job.QueueService;
+import com.avaya.queue.service.QueueService;
 import com.avaya.queue.util.Constants;
 import com.avaya.queue.util.QueueMonitoringProperties;
 import com.avaya.queue.util.SRDetailsDownloader;
@@ -100,7 +100,7 @@ public class EmailReceiverService{
 		}
 		queueService=(QueueService) QueueMonitoringApp.context.getBean("queueService");
 		srDetailsDownloader.getSRDetails(queueList,userHome + File.separator + Constants.APP_NAME + File.separator + resDir);
-		queueService.processEmailToSend(queueList, velocityEngine, context);
+		queueService.processEmailToSend(queueList, velocityEngine, context,"ADV_APP_SUPPORT");
 		logger.info("End processEmailToSend");
 	}
 

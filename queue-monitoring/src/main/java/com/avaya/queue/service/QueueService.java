@@ -1,4 +1,4 @@
-package com.avaya.queue.job;
+package com.avaya.queue.service;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -30,8 +30,8 @@ import com.avaya.queue.util.Constants;
 public class QueueService {
 	private final static Logger logger = Logger.getLogger(QueueService.class);
 	private CustomerContractDao customerContractDao;
-	
-	public void processEmailToSend(List<SR> queueList, VelocityEngine velocityEngine, VelocityContext context) {
+
+	public void processEmailToSend(List<SR> queueList, VelocityEngine velocityEngine, VelocityContext context, String queueName) {
 		logger.info("Begin processEmailToSend()");
 		Notification notification = null;
 		NotificationDao noticiationDao = (NotificationDao) QueueMonitoringApp.context.getBean("notificationDao");
@@ -46,14 +46,14 @@ public class QueueService {
 				this.setSRCustomerContractsDb(sr,context);
 				if (now.getDayOfWeek() < DateTimeConstants.SATURDAY) {// Weekdays
 					logger.info("Weekday :" + now.getDayOfWeek());
-					this.sendEmail(sr, 0,velocityEngine,context);
+					this.sendEmail(sr, 0,velocityEngine,context,queueName);
 					noticiationDao.insert(srNumber);
 				} else {// Weekend
 						// On the Weekend sends email only for SBI or OUTG
 					logger.info("Weekend :" + now.getDayOfWeek());
 					if (sr.getSev().equalsIgnoreCase(Constants.SBI) || sr.getSev().equalsIgnoreCase(Constants.OUTG)) {
 						logger.info("Weekend :" + now.getDayOfWeek() + " SBI OR OUTG");
-						this.sendEmail(sr, 0,velocityEngine,context);
+						this.sendEmail(sr, 0,velocityEngine,context,queueName);
 						noticiationDao.insert(srNumber);
 					}
 				}
@@ -84,13 +84,13 @@ public class QueueService {
 					int reminder = notification.getReminder() + 1;
 					this.setSRCustomerContractsDb(sr,context);
 					if (now.getDayOfWeek() < DateTimeConstants.SATURDAY) {// Weekdays
-						this.sendEmail(sr, reminder,velocityEngine,context);
+						this.sendEmail(sr, reminder,velocityEngine,context,queueName);
 						noticiationDao.update(srNumber, reminder);
 					} else {// Weekend
 							// On the Weekend sends email only for SBI or OUTG
 						if (sr.getSev().equalsIgnoreCase(Constants.SBI)
 								|| sr.getSev().equalsIgnoreCase(Constants.OUTG)) {
-							this.sendEmail(sr, reminder,velocityEngine,context);
+							this.sendEmail(sr, reminder,velocityEngine,context,queueName);
 							noticiationDao.update(srNumber, reminder);
 						}
 					}
@@ -99,8 +99,9 @@ public class QueueService {
 		}
 	}
 	
-	private void sendEmail(SR sr, Integer reminder,VelocityEngine velocityEngine, VelocityContext context) {
+	private void sendEmail(SR sr, Integer reminder,VelocityEngine velocityEngine, VelocityContext context, String queueName) {
 		logger.info("sendEmail()");
+		logger.info("file.resource.loader.path: " + velocityEngine.getProperty("file.resource.loader.path"));
 		Template template = null;
 		boolean contractFound = false;
 		String subject = null;
@@ -137,6 +138,7 @@ public class QueueService {
 						+ sr.getAccount() + " / " + sr.getProductEntitled() + " / " + sr.getDescription();
 			}
 		} else {
+			context.put("queueName", queueName);
 			subject = Settings.getString(Constants.APP_SHORT_NAME) + " - Queue is Empty";
 		}
 

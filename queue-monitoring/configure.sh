@@ -14,6 +14,10 @@ mkdir ${QMA_HOME}/bin
 mkdir ${QMA_HOME}/config
 mkdir ${QMA_HOME}/contracts
 mkdir ${QMA_HOME}/res_queue
+mkdir ${QMA_HOME}/res_queue_adv_app_support
+mkdir ${QMA_HOME}/res_queue_adv_app_imp
+mkdir ${QMA_HOME}/res_pending_adv_app_support
+mkdir ${QMA_HOME}/res_pending_adv_app_imp
 mkdir ${QMA_HOME}/res_overdue
 mkdir ${QMA_HOME}/res_pending
 mkdir ${QMA_HOME}/db
