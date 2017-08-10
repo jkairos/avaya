@@ -16,7 +16,12 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
 
+import org.joda.time.Instant;
+
+import com.avaya.queue.email.AsyncEmailer;
+import com.avaya.queue.util.Constants;
 import com.avaya.queue.util.QueueMonitoringProperties;
+import com.avaya.queue.util.Util;
 
 public class PKIXAuthenticator{
 	
@@ -77,7 +82,9 @@ public class PKIXAuthenticator{
 		try {
 			sc.init(null, trustAllCerts, new java.security.SecureRandom());
 		} catch (KeyManagementException e) {
-			// TODO Auto-generated catch block
+			String report = Util.getReport(e);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 			e.printStackTrace();
 		}
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());

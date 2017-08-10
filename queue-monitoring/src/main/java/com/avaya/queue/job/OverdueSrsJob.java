@@ -19,6 +19,7 @@ import org.apache.velocity.Template;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Hours;
+import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.jsoup.Jsoup;
@@ -31,7 +32,9 @@ import com.avaya.queue.entity.IntervalUpdate;
 import com.avaya.queue.entity.SR;
 import com.avaya.queue.security.PKIXAuthenticator;
 import com.avaya.queue.util.Constants;
+import com.avaya.queue.util.QueueMonitoringProperties;
 import com.avaya.queue.util.SiebelReportDownloader;
+import com.avaya.queue.util.Util;
 
 public class OverdueSrsJob extends ApplicationJob {
 	private final static Logger logger = Logger.getLogger(OverdueSrsJob.class);
@@ -64,6 +67,9 @@ public class OverdueSrsJob extends ApplicationJob {
 			this.processEmailToSend(queueList);
 			logger.info("End Overdue SRS Queue");
 		}catch(RuntimeException re){
+			String report = Util.getReport(re);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 			logger.error("ERROR PROCESSING LIST OF OVERDUE SRS", re);
 		}
 	}
@@ -121,14 +127,23 @@ public class OverdueSrsJob extends ApplicationJob {
 			ownerName = username.text();
 
 		} catch (MalformedURLException e) {
+			String report = Util.getReport(e);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 			e.printStackTrace();
 			logger.error(e);
 			throw new RuntimeException(e);
 		} catch (IOException e) {
+			String report = Util.getReport(e);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 			e.printStackTrace();
 			logger.error(e);
 			throw new RuntimeException(e);
 		} catch (Exception e) {
+			String report = Util.getReport(e);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 			e.printStackTrace();
 			logger.error(e);
 			throw new RuntimeException(e);

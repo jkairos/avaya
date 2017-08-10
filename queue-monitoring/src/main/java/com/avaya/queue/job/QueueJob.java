@@ -4,12 +4,16 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.joda.time.Instant;
 
 import com.avaya.queue.app.QueueMonitoringApp;
+import com.avaya.queue.email.AsyncEmailer;
 import com.avaya.queue.entity.SR;
 import com.avaya.queue.service.QueueService;
 import com.avaya.queue.util.Constants;
+import com.avaya.queue.util.QueueMonitoringProperties;
 import com.avaya.queue.util.SiebelReportDownloader;
+import com.avaya.queue.util.Util;
 
 public class QueueJob extends ApplicationJob {
 	private final static Logger logger = Logger.getLogger(QueueJob.class);
@@ -50,6 +54,9 @@ public class QueueJob extends ApplicationJob {
 			}
 			logger.info("End Process Queue - "+queueName);
 		} catch (RuntimeException re) {
+			String report = Util.getReport(re);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 			logger.error("ERROR PROCESSING LIST OF SRS IN QUEUE", re);
 		}
 	}

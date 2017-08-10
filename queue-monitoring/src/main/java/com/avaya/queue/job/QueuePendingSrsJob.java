@@ -6,12 +6,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
+import org.joda.time.Instant;
 
 import com.avaya.queue.email.AsyncEmailer;
 import com.avaya.queue.email.Settings;
 import com.avaya.queue.entity.SR;
 import com.avaya.queue.util.Constants;
+import com.avaya.queue.util.QueueMonitoringProperties;
 import com.avaya.queue.util.SiebelReportDownloader;
+import com.avaya.queue.util.Util;
 
 public class QueuePendingSrsJob extends ApplicationJob {
 	private final static Logger logger = Logger.getLogger(QueuePendingSrsJob.class);
@@ -44,6 +47,9 @@ public class QueuePendingSrsJob extends ApplicationJob {
 			this.processQueue(Settings.getString(Constants.QUEUE_MONITORING_IMP_URL), Constants.IMP_QUEUE_PENDING_FILE_NAME, resDirAdvImp, queueName);
 			logger.info("End Process QueuePendingSrs");
 		}catch(RuntimeException re){
+			String report = Util.getReport(re);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 			logger.error("ERROR READING PENDING SRS ",re);
 		}
 	}

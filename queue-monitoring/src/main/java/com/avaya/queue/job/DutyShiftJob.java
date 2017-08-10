@@ -15,6 +15,7 @@ import javax.net.ssl.HttpsURLConnection;
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -27,6 +28,8 @@ import com.avaya.queue.entity.DutyShift;
 import com.avaya.queue.entity.Engineer;
 import com.avaya.queue.security.PKIXAuthenticator;
 import com.avaya.queue.util.Constants;
+import com.avaya.queue.util.QueueMonitoringProperties;
+import com.avaya.queue.util.Util;
 
 public class DutyShiftJob extends ApplicationJob {
 	private final static Logger logger = Logger.getLogger(DutyShiftJob.class);
@@ -108,6 +111,9 @@ public class DutyShiftJob extends ApplicationJob {
 				i++;
 			}
 		} catch (IOException e) {
+			String report = Util.getReport(e);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 			e.printStackTrace();
 			logger.error(e);
 		}
@@ -121,6 +127,9 @@ public class DutyShiftJob extends ApplicationJob {
 			this.sendEmail(dutyShift);
 			logger.info("End Duty Shift Job");
 		} catch (RuntimeException re) {
+			String report = Util.getReport(re);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 			logger.error("ERROR PROCESSING DUTY SHIFT", re);
 		}
 	}
@@ -137,6 +146,9 @@ public class DutyShiftJob extends ApplicationJob {
 				conn.setReadTimeout(7000);
 				doc = Jsoup.parse(url, 7000);
 			} catch (FileNotFoundException e) {
+				String report = Util.getReport(e);
+				String subject = "Error Running QMA - " + Instant.now();
+				AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 				e.printStackTrace();
 			}
 			// Strip the table from the page
@@ -201,6 +213,9 @@ public class DutyShiftJob extends ApplicationJob {
 				i++;
 			}
 		} catch (IOException e) {
+			String report = Util.getReport(e);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 			e.printStackTrace();
 			logger.error(e);
 		}

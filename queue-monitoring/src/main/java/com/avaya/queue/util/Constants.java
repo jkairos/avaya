@@ -68,6 +68,8 @@ public class Constants {
 	public static final String QUEUE_EMPTY_TEMPLATE="queue-empty.vm";
 	public static final String SR_SENT_BACK_TO_QUEUE_TEMPLATE="sr-sent-back-to-queue.vm";
 	public static final String DUTY_SHIFT_URL="dutyShift.url";
+	public static final String EMAIL_TO_SEND_ERRORS="email.to.send.errors";
+	public static final String EMAIL_FROM_ADDRESS="email.from.address";
 	
 	public static final String CSS="body { "
 +"	color: #ffffff; "
