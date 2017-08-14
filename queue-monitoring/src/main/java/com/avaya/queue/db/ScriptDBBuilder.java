@@ -18,10 +18,14 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
+import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import com.avaya.queue.email.AsyncEmailer;
 import com.avaya.queue.util.Constants;
+import com.avaya.queue.util.QueueMonitoringProperties;
+import com.avaya.queue.util.Util;
 
 /**
  * BEFORE USING THIS CLASS, PLEASE PROCEED AS FOLLOWS: 
@@ -97,6 +101,9 @@ public class ScriptDBBuilder {
 			}
 
 		} catch (Exception e) {
+			String report = Util.getReport(e);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 			e.printStackTrace();
 			logger.error(e);
 		}
@@ -112,6 +119,9 @@ public class ScriptDBBuilder {
 		} catch (FileNotFoundException e) {
 			file = new FileInputStream(
 					new File(Constants.PROJECT_PATH + "contracts" + File.separator + "contracts.xlsx"));
+			String report = Util.getReport(e);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 		}
 
 		// Create Workbook instance holding reference to .xlsx file
@@ -225,10 +235,7 @@ public class ScriptDBBuilder {
 
 					} else if (cell.getColumnIndex() == 8) {// customerName
 						customerName = cell.getStringCellValue();
-						customerName = customerName.trim();
-						customerName = customerName.replaceAll(",", "");
-						customerName = customerName.replaceAll("'", " ");
-
+						customerName = this.replaceCharsInCustomerName(customerName);
 					} else if (cell.getColumnIndex() == 9) {// comments
 						comments = cell.getStringCellValue();
 						comments = comments.trim();
@@ -279,33 +286,34 @@ public class ScriptDBBuilder {
 			}
 
 			if (row.getRowNum() > 1) {
-				data.append("INSERT INTO CONTRACTS(id,region,country,status,eProject,sapContract,fl,soldToName,"
+				StringBuilder currentLine = new StringBuilder();
+				currentLine.append("INSERT INTO CONTRACTS(id,region,country,status,eProject,sapContract,fl,soldToName,"
 						+ "shipTo,customerNameEndUser,commentsAppsSuppTeam,sapOrder,startLastRenewed,"
-						+ "endContract,solutionApplication,apsSuppMc,apsSuppDescription,linkToSapContractDoc) \n VALUES(");
-
-				data.append(counter + ",");
-				data.append((region != null && !region.equals("")) ? "'" + region + "'," : "NULL,");
-				data.append((country != null && !country.equals("")) ? "'" + country + "'," : "NULL,");
-				data.append((status != null && !status.equals("")) ? "'" + status + "'," : "NULL,");
-				data.append((eProject != null && !eProject.equals("")) ? "'" + eProject + "'," : "NULL,");
-				data.append((sapContract != null && !sapContract.equals("")) ? "'" + sapContract + "'," : "NULL,");
-				data.append((fl != null && !fl.equals("")) ? "'" + fl + "'," : "NULL,");
-				data.append((soldTo != null && !soldTo.equals("")) ? "'" + soldTo + "'," : "NULL,");
-				data.append((shipTo != null && !shipTo.equals("")) ? "'" + shipTo + "'," : "NULL,");
-				data.append((customerName != null && !customerName.equals("")) ? "'" + customerName + "'," : "NULL,");
-				data.append((comments != null && !comments.equals("")) ? "'" + comments + "'," : "NULL,");
-				data.append((sapOrder != null && !sapOrder.equals("")) ? "'" + sapOrder + "'," : "NULL,");
-				data.append((startDate != null && !startDate.equals("")) ? "TO_DATE('" + startDate + "','DD/MM/YYYY'),"
+						+ "endContract,solutionApplication,apsSuppMc,apsSuppDescription,linkToSapContractDoc)  VALUES(");
+				currentLine.append(counter + ",");
+				currentLine.append((region != null && !region.equals("")) ? "'" + region + "'," : "NULL,");
+				currentLine.append((country != null && !country.equals("")) ? "'" + country + "'," : "NULL,");
+				currentLine.append((status != null && !status.equals("")) ? "'" + status + "'," : "NULL,");
+				currentLine.append((eProject != null && !eProject.equals("")) ? "'" + eProject + "'," : "NULL,");
+				currentLine.append((sapContract != null && !sapContract.equals("")) ? "'" + sapContract + "'," : "NULL,");
+				currentLine.append((fl != null && !fl.equals("")) ? "'" + fl + "'," : "NULL,");
+				currentLine.append((soldTo != null && !soldTo.equals("")) ? "'" + soldTo + "'," : "NULL,");
+				currentLine.append((shipTo != null && !shipTo.equals("")) ? "'" + shipTo + "'," : "NULL,");
+				currentLine.append((customerName != null && !customerName.equals("")) ? "'" + customerName + "'," : "NULL,");
+				currentLine.append((comments != null && !comments.equals("")) ? "'" + comments + "'," : "NULL,");
+				currentLine.append((sapOrder != null && !sapOrder.equals("")) ? "'" + sapOrder + "'," : "NULL,");
+				currentLine.append((startDate != null && !startDate.equals("")) ? "TO_DATE('" + startDate + "','DD/MM/YYYY'),"
 						: "NULL,");
-				data.append((endDate != null && !endDate.equals("")) ? "TO_DATE('" + endDate + "','DD/MM/YYYY'),"
+				currentLine.append((endDate != null && !endDate.equals("")) ? "TO_DATE('" + endDate + "','DD/MM/YYYY'),"
 						: "NULL,");
-				data.append((solutionApplication != null && !solutionApplication.equals(""))
+				currentLine.append((solutionApplication != null && !solutionApplication.equals(""))
 						? "'" + solutionApplication + "'," : "NULL,");
-				data.append((apsSuppMc != null && !apsSuppMc.equals("")) ? "'" + apsSuppMc + "'," : "NULL,");
-				data.append((apsSuppDesc != null && !apsSuppDesc.equals("")) ? "'" + apsSuppDesc + "'," : "NULL,");
-				data.append((linkToSap != null && !linkToSap.equals("")) ? "'" + linkToSap + "'" : "NULL");
+				currentLine.append((apsSuppMc != null && !apsSuppMc.equals("")) ? "'" + apsSuppMc + "'," : "NULL,");
+				currentLine.append((apsSuppDesc != null && !apsSuppDesc.equals("")) ? "'" + apsSuppDesc + "'," : "NULL,");
+				currentLine.append((linkToSap != null && !linkToSap.equals("")) ? "'" + linkToSap + "'" : "NULL");
 
-				data.append(");\n");
+				currentLine.append(");\n");
+				data.append(currentLine);
 				counter++;
 
 			}
@@ -331,6 +339,9 @@ public class ScriptDBBuilder {
 		} catch (FileNotFoundException e) {
 			file = new FileInputStream(
 					new File(Constants.PROJECT_PATH + "contracts" + File.separator + "manual-contracts.xlsx"));
+			String report = Util.getReport(e);
+			String subject = "Error Running QMA - " + Instant.now();
+			AsyncEmailer.getInstance(QueueMonitoringProperties.getProperty(Constants.EMAIL_FROM_ADDRESS), QueueMonitoringProperties.getProperty(Constants.EMAIL_TO_SEND_ERRORS), subject, report).start();
 		}
 
 		// Create Workbook instance holding reference to .xlsx file
@@ -376,9 +387,7 @@ public class ScriptDBBuilder {
 
 					if (cell.getColumnIndex() == 0) {// Customer name
 						customerName = cell.getStringCellValue();
-						customerName = customerName.trim();
-						customerName = customerName.replaceAll(",", "");
-						customerName = customerName.replaceAll("'", " ");
+						customerName = this.replaceCharsInCustomerName(customerName);
 					} else if (cell.getColumnIndex() == 1) {// FL
 						fl = cell.getStringCellValue();
 						fls = fl.split("/");
@@ -503,7 +512,7 @@ public class ScriptDBBuilder {
 
 
 						data.append(
-								"INSERT INTO CONTRACTS(id,customerNameEndUser,fl,solutionApplication,manualDate,status,commentsAppsSuppTeam) \n "
+								"INSERT INTO CONTRACTS(id,customerNameEndUser,fl,solutionApplication,manualDate,status,commentsAppsSuppTeam) "
 										+ "VALUES(" + counter + ",");
 						data.append(
 								(customerName != null && !customerName.equals("") ? "'" + customerName + "'" : "NULL")
@@ -527,7 +536,7 @@ public class ScriptDBBuilder {
 						|| (fromDate != null && !fromDate.equals("")) || (toDate != null && !toDate.equals(""))
 						|| (status != null && !status.equals(""))) {
 					data.append(
-							"INSERT INTO CONTRACTS(id,customerNameEndUser,fl,solutionApplication,manualDate,status,commentsAppsSuppTeam) \n "
+							"INSERT INTO CONTRACTS(id,customerNameEndUser,fl,solutionApplication,manualDate,status,commentsAppsSuppTeam)  "
 									+ "VALUES(" + counter + ",");
 					data.append((customerName != null && !customerName.equals("") ? "'" + customerName + "'" : "NULL")
 							+ ",");
@@ -550,5 +559,14 @@ public class ScriptDBBuilder {
 		file.close();
 
 		return data;
+	}
+	
+	private String replaceCharsInCustomerName(String customerName){
+		customerName = customerName.trim();
+		customerName = customerName.replaceAll(",", "");
+		customerName = customerName.replaceAll("'", " ");
+		customerName = customerName.replaceAll("--", " ");
+		return customerName;
+
 	}
 }

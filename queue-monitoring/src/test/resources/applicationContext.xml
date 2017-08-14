@@ -150,7 +150,8 @@
 	<!-- Fires Every Day at 00:00 -->
 	<bean id="cronTriggerDutyShiftJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="dutyShiftJob" />
-		<property name="cronExpression" value="0 0 9 ? * MON,FRI" />
+		<property name="cronExpression" value="0/60 0/1 * ? * 1-5" />
+		<!--  <property name="cronExpression" value="0 0 9 ? * MON,FRI" />-->
 	</bean>
 
 	<!-- Scheduler factory bean to glue together jobDetails and triggers to Configure Quartz Scheduler -->
@@ -167,12 +168,12 @@
 
 		<property name="triggers">
 			<list>
-				<ref bean="cronTriggerQueueJobWeekDays" />
+				<!--  <ref bean="cronTriggerQueueJobWeekDays" />
 				<ref bean="cronTriggerQueueImpJobWeekDays" />
 				<ref bean="cronTriggerQueueJobWeekend" />
 				<ref bean="cronTriggerQueueImpJobWeekend" />
 				<ref bean="cronTriggerQueuePendingSrsJobWeekDays" />
-				<ref bean="cronTriggerOverdueSrsJob" />
+				<ref bean="cronTriggerOverdueSrsJob" />-->
 				<ref bean="cronTriggerDutyShiftJob" />
 			</list>
 		</property>

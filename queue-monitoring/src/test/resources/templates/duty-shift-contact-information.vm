@@ -8,14 +8,14 @@
 	<body>
 		<font color="black">
 	     <p>Dear <b>$!dutyShift.westEngineer.name/ $!dutyShift.eastEngineer.name/ $!dutyShift.backupSeniorEngineer.name, </b> </p>
-	     <p>You will be <b>ON DUTY</b> this weekend (<font color="#0000ff"><u>$!dutyShift.coverageWeek</u></font>).</p>
+	     <p>You will be <b>ON DUTY</b> this weekend (<font color="#0000ff"><u>$!dutyShift.coverageWeek</u></font>), below are the phone numbers in case you need to contact anyone: <p>
 		 <p><b><u>Rules of Engagement</u></b></p>
 		 <ul>
 		 	<li>The Weekend coverage only applies to <u>Severity 1 cases (Outage) and Severity 2 cases (Severe Business Impact) </u> that are routed to <b>ADV_APP_SUPPORT</b> queue in Siebel ticketing system.</li>
 		 	<li>Weekend coverage begins on <u>Saturday 12:01 AM GMT</u> and ends on <u>Sunday 11:59 PM GMT</u> every week.</li>
 		 	<li>As soon as a high severity ticket needs to be routed to Application Support team, Backbone/GSS team needs to call the engineer on duty. </li>
 		 </ul>
-		 <p>Below are the phone numbers in case you need to contact anyone:</p>
+		 
 		<table class="employeeMessageContainer">
 			<tr>
 	         <td class="fullNoBorderContainer" colspan="2">

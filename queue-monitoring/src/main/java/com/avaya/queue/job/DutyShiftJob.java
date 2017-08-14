@@ -98,6 +98,7 @@ public class DutyShiftJob extends ApplicationJob {
 				country = tds.get(5).text().trim();
 
 				engineer.setName(name);
+				name=name.trim();
 				engineer.setHandle(handle);
 				engineer.setVoice(voice);
 				engineer.setUsExtension(usExtension);
@@ -157,7 +158,7 @@ public class DutyShiftJob extends ApplicationJob {
 			// Table
 			// Strip the rows from the table
 			Elements tbRows = table.select("tr");
-			int i = 4;// Skips Table's header
+			int i = 5;// Skips Table's header
 			LocalDate now = new LocalDate();
 
 			String year = String.valueOf(now.getYear());
@@ -184,7 +185,8 @@ public class DutyShiftJob extends ApplicationJob {
 				coverageWeek = coverageWeek.trim();
 				String days[] = coverageWeek.split("-");
 				if (days.length > 1) {
-					String startDay = days[0].substring(0, days[0].indexOf("/"));
+					String startDay = days[0].substring(days[0].lastIndexOf("/")+1);
+					startDay=startDay.trim();
 					if (startDay.charAt(0) == '0') {
 						startDay = startDay.substring(1);
 					}
