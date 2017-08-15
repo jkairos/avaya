@@ -115,22 +115,22 @@
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
 	<bean id="cronTriggerQueueJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueJob" />
-		<property name="cronExpression" value="0/180 0/1 * ? * 1-5" />
+		<property name="cronExpression" value="0/300 0/1 * ? * 1-5" />
 	</bean>
 
 	<bean id="cronTriggerQueueImpJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueImpJob" />
-		<property name="cronExpression" value="0/180 0/1 * ? * 1-5" />
+		<property name="cronExpression" value="0/300 0/1 * ? * 1-5" />
 	</bean>
 
 	<bean id="cronTriggerQueueJobWeekend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueJob" />
-		<property name="cronExpression" value="0/300 0/1 * ? * 6-7" />
+		<property name="cronExpression" value="0/600 0/1 * ? * 6-7" />
 	</bean>
 
 	<bean id="cronTriggerQueueImpJobWeekend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueImpJob" />
-		<property name="cronExpression" value="0/300 0/1 * ? * 6-7" />
+		<property name="cronExpression" value="0/600 0/1 * ? * 6-7" />
 	</bean>
 
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
