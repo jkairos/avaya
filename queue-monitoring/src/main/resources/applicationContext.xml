@@ -87,8 +87,13 @@
 		<property name="durability" value="true" />
 	</bean>
 
-	<bean name="queuePendingSrsJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.avaya.queue.job.QueuePendingSrsJob" />
+	<bean name="advAppImpQueuePendingSrsJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.avaya.queue.job.AdvAppImpQueuePendingSrsJob" />
+		<property name="durability" value="true" />
+	</bean>
+
+	<bean name="advAppSupportQueuePendingSrsJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.avaya.queue.job.AdvAppSupportQueuePendingSrsJob" />
 		<property name="durability" value="true" />
 	</bean>
 
@@ -115,27 +120,33 @@
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
 	<bean id="cronTriggerQueueJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueJob" />
-		<property name="cronExpression" value="0/60 0/1 * ? * 1-5" />
+		<property name="cronExpression" value="0/60 0/5 * ? * 1-5" />
 	</bean>
 
 	<bean id="cronTriggerQueueImpJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueImpJob" />
-		<property name="cronExpression" value="0/60 0/1 * ? * 1-5" />
+		<property name="cronExpression" value="0/60 0/5 * ? * 1-5" />
 	</bean>
 
 	<bean id="cronTriggerQueueJobWeekend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueJob" />
-		<property name="cronExpression" value="0/180 0/1 * ? * 6-7" />
+		<property name="cronExpression" value="0/60 0/10 * ? * 6-7" />
 	</bean>
 
 	<bean id="cronTriggerQueueImpJobWeekend" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="queueImpJob" />
-		<property name="cronExpression" value="0/180 0/1 * ? * 6-7" />
+		<property name="cronExpression" value="0/60 0/10 * ? * 6-7" />
 	</bean>
 
 	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
-	<bean id="cronTriggerQueuePendingSrsJobWeekDays" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-		<property name="jobDetail" ref="queuePendingSrsJob" />
+	<bean id="cronTriggerAdvAppImpQueuePendingSrs" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="advAppImpQueuePendingSrsJob" />
+		<property name="cronExpression" value="0 0 0/8 ? * MON-FRI" />
+	</bean>
+
+	<!-- Seconds, Mins, hours, Day of Month, Month, Day of Week, Year -->
+	<bean id="cronTriggerAdvAppSupQueuePendingSrs" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="advAppSupportQueuePendingSrsJob" />
 		<property name="cronExpression" value="0 0 0/2 ? * MON-FRI" />
 	</bean>
 
@@ -159,7 +170,8 @@
 			<list>
 				<ref bean="queueJob" />
 				<ref bean="queueImpJob" />
-				<ref bean="queuePendingSrsJob" />
+				<ref bean="advAppImpQueuePendingSrsJob" />
+				<ref bean="advAppSupportQueuePendingSrsJob" />
 				<ref bean="overdueSrsJob" />
 				<ref bean="dutyShiftJob" />
 			</list>
@@ -171,7 +183,8 @@
 				<ref bean="cronTriggerQueueImpJobWeekDays" />
 				<ref bean="cronTriggerQueueJobWeekend" />
 				<ref bean="cronTriggerQueueImpJobWeekend" />
-				<ref bean="cronTriggerQueuePendingSrsJobWeekDays" />
+				<ref bean="cronTriggerAdvAppImpQueuePendingSrs" />
+				<ref bean="cronTriggerAdvAppSupQueuePendingSrs" />
 				<ref bean="cronTriggerOverdueSrsJob" />
 				<ref bean="cronTriggerDutyShiftJob" />
 			</list>

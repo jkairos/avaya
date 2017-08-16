@@ -18,34 +18,31 @@ import com.avaya.queue.util.Util;
 
 public class QueuePendingSrsJob extends ApplicationJob {
 	private final static Logger logger = Logger.getLogger(QueuePendingSrsJob.class);
-	private final static String resDir="res_pending_adv_app_support";
-	private final static String resDirAdvImp="res_pending_adv_app_imp";
+	private String resDir;
+	private String queueName;
+	private String fileName;
 	
 	public QueuePendingSrsJob(){}
-	
+
+	public QueuePendingSrsJob(String url, String queueName, String fileName,String resDir) {
+		this.queueName=queueName;
+		this.fileName=fileName;
+		this.resDir=resDir;
+		siebelReportDownloader = new SiebelReportDownloader(url,this.fileName, this.resDir);
+	}
+
 	public void cleanup() {
-		File file = new File(userHome+File.separator+Constants.APP_NAME+File.separator+resDir+File.separator+Constants.QUEUE_PENDING_FILE_NAME);
-		logger.info("Deleting file: " +(file.getAbsolutePath()));
-		if (file.exists()) {
-			file.delete();
-		}
-		
-		file = new File(userHome+File.separator+Constants.APP_NAME+File.separator+resDirAdvImp+File.separator+Constants.IMP_QUEUE_PENDING_FILE_NAME);
+		File file = new File(userHome+File.separator+Constants.APP_NAME+File.separator+resDir+File.separator+fileName);
 		logger.info("Deleting file: " +(file.getAbsolutePath()));
 		if (file.exists()) {
 			file.delete();
 		}
 	}	
 	public void processJob() {
-		logger.info("Begin Process QueuePendingSrs");
-		String queueName="ADV_APP_SUPPORT";
+		logger.info("Begin Process QueuePendingSrs - " + this.queueName);
 		try{
-			//ADV_APP_SUPPORT Queue
-			this.processQueue(Settings.getString(Constants.QUEUE_MONITORING_URL), Constants.QUEUE_PENDING_FILE_NAME, resDir, queueName);
-			//ADV_APP_IMP Queue
-			queueName="ADV_APP_IMP";
-			this.processQueue(Settings.getString(Constants.QUEUE_MONITORING_IMP_URL), Constants.IMP_QUEUE_PENDING_FILE_NAME, resDirAdvImp, queueName);
-			logger.info("End Process QueuePendingSrs");
+			this.processQueue();
+			logger.info("End Process QueuePendingSrs - " + this.queueName);
 		}catch(RuntimeException re){
 			String report = Util.getReport(re);
 			String subject = "Error Running QMA - " + Instant.now();
@@ -54,8 +51,8 @@ public class QueuePendingSrsJob extends ApplicationJob {
 		}
 	}
 	
-	private void processQueue(String url, String fileName, String resDir, String queueName){
-		List<SR> queueList = this.getQueueList(url, fileName, resDir);
+	private void processQueue(){
+		List<SR> queueList = this.getQueueList();
 		logger.info("Current Queue Size: " + queueList.size());
 		if (queueList != null && !queueList.isEmpty()) {
 			srDetailsDownloader.getSRDetails(queueList,userHome + File.separator + Constants.APP_NAME + File.separator + resDir);
@@ -63,8 +60,7 @@ public class QueuePendingSrsJob extends ApplicationJob {
 		this.processEmailToSend(queueList,queueName);
 	}
 	
-	private List<SR> getQueueList(String url, String fileName, String resDir){
-		siebelReportDownloader = new SiebelReportDownloader(url,fileName,resDir);
+	private List<SR> getQueueList(){
 		siebelReportDownloader.readUrl();
 		List<SR> queueList = siebelReportDownloader.getQueueList(fileName);
 		return queueList;
